@@ -12,6 +12,8 @@ public class CarConfiguration : IEntityTypeConfiguration<Car>
 	{
 		builder.HasKey(c => c.Id);
 
+		builder.Property(c => c.Id).ValueGeneratedOnAdd().HasDefaultValueSql("NEWID()");
+
 		builder.Property(c => c.SerialNumber)
 		.IsRequired()
 		.HasMaxLength(50);

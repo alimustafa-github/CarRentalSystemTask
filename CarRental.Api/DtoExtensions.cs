@@ -36,7 +36,7 @@ public static class DtoExtensions
 
 	public static CarDto ConvertToCarDto(this Car car)
 	{
-		if (car is not not)
+		if (car is not null)
 		{
 			return new CarDto
 			{

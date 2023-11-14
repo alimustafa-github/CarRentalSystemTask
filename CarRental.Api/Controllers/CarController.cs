@@ -114,8 +114,19 @@ public class CarController : ControllerBase
 
 		try
 		{
-			if (carDto!=null)
+			if (carDto != null)
 			{
+				IEnumerable<Car> cars = await _carUnit.Entity.GetAllFromCache();
+				var serialNumberExisted = cars.Any(c => c.SerialNumber == carDto.SerialNumber);
+				var idExisted = cars.Any(c => c.Id == carDto.Id);
+				if (serialNumberExisted)
+				{
+					return new ApiResponse(false, $"The Serial Number you have provided {carDto.SerialNumber} is already exsists , try another one");
+				}
+				if (idExisted)
+				{
+					return new ApiResponse(false, $"The Id you have provided {carDto.Id} is already exsists , try another one or do not enter any Id (It is auto-generated field)");
+				}
 				Car car = carDto.ConvertToCar();
 				await _carUnit.Entity.AddAsync(car);
 				await _carUnit.Save();
@@ -137,15 +148,30 @@ public class CarController : ControllerBase
 
 
 	[HttpPut("updatecar")]
-	public async Task<ApiResponse> updateCar( [FromBody] CarDto carDto)
+	public async Task<ApiResponse> updateCar([FromBody] CarDto carDto)
 	{
 
 		try
 		{
 			if (carDto != null)
 			{
+				IEnumerable<Car> cars = await _carUnit.Entity.GetAllFromCache();
+				var serialNumberExisted = cars.Any(c => c.SerialNumber == carDto.SerialNumber);
+				var idExisted = cars.Any(c => c.Id == carDto.Id);
+				if (serialNumberExisted)
+				{
+					return new ApiResponse(false, $"The Serial Number you have provided {carDto.SerialNumber} is already exsists , try another one");
+				}
+				if (idExisted)
+				{
+					return new ApiResponse(false, $"The Id you have provided {carDto.Id} is already exsists , try another one");
+				}
+
+
 				Car car = carDto.ConvertToCar();
-			    _carUnit.Entity.Update(car);
+
+
+				_carUnit.Entity.Update(car);
 				await _carUnit.Save();
 
 				return new ApiResponse(true, "Car Updated Successfully");
@@ -195,7 +221,7 @@ public class CarController : ControllerBase
 	{
 		try
 		{
-			IEnumerable<Car> cars =await _carUnit.Entity.SortAsync(car => car.SerialNumber);
+			IEnumerable<Car> cars = await _carUnit.Entity.SortAsync(car => car.SerialNumber);
 			IEnumerable<CarDto> carDtos = cars.ConvertToCarDto();
 
 			if (carDtos != null)
@@ -262,7 +288,7 @@ public class CarController : ControllerBase
 
 			}
 		}
-		catch (Exception ex)	
+		catch (Exception ex)
 		{
 			return new ApiResponse<IEnumerable<CarDto>>(false, Enumerable.Empty<CarDto>(), ex.Message);
 		}
