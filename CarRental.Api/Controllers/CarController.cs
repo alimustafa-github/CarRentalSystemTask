@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using CarRental.Core.Dtos;
+﻿using CarRental.Core.Dtos;
 using CarRental.Core.Entities;
 using CarRental.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -11,12 +10,10 @@ namespace CarRental.Api.Controllers;
 public class CarController : ControllerBase
 {
 	private readonly IUnitOfWork<Car> _carUnit;
-	private readonly IMapper _mapper;
 
-	public CarController(IUnitOfWork<Car> carUnit, IMapper mapper)
+	public CarController(IUnitOfWork<Car> carUnit)
 	{
 		_carUnit = carUnit;
-		_mapper = mapper;
 	}
 
 
@@ -26,6 +23,30 @@ public class CarController : ControllerBase
 		try
 		{
 			IEnumerable<Car> cars = await _carUnit.Entity.GetAllAsync();
+			IEnumerable<CarDto> carDtos = cars.ConvertToCarDto();
+
+			if (carDtos != null)
+			{
+				return new ApiResponse<IEnumerable<CarDto>>(true, carDtos);
+			}
+			else
+			{
+				return new ApiResponse<IEnumerable<CarDto>>(true, Enumerable.Empty<CarDto>(), "We do not currently have any cars in our system");
+			}
+		}
+		catch (Exception ex)
+		{
+			return new ApiResponse<IEnumerable<CarDto>>(false, Enumerable.Empty<CarDto>(), ex.Message);
+		}
+	}
+
+
+	[HttpGet("getallcarsfromcache")]
+	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCarsFromCache()
+	{
+		try
+		{
+			IEnumerable<Car> cars = await _carUnit.Entity.GetAllFromCache();
 			IEnumerable<CarDto> carDtos = cars.ConvertToCarDto();
 
 			if (carDtos != null)

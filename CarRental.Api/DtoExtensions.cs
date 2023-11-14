@@ -2,7 +2,10 @@
 using CarRental.Core.Entities;
 
 namespace CarRental.Api;
-
+/// <summary>
+/// this class is responsible for Mapping from one object to a dto of that object
+/// I usually use AutoMapper for Mapping but for simplification purposes I have mapped them manually using extension methods
+/// </summary>
 public static class DtoExtensions
 {
 

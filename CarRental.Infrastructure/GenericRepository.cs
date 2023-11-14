@@ -1,16 +1,19 @@
 ﻿using CarRental.Core.Interfaces;
 using CarRental.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace CarRental.Infrastructure;
 public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
 	private readonly ApplicationDbContext _context;
+	private readonly IMemoryCache _memoryCache;
 	private DbSet<T> _dbSet;
 
-	public GenericRepository(ApplicationDbContext context)
+	public GenericRepository(ApplicationDbContext context,IMemoryCache memoryCache)
 	{
 		_context = context;
+		_memoryCache = memoryCache;
 		_dbSet = _context.Set<T>();
 	}
 	public async Task AddAsync(T entity)
@@ -47,5 +50,17 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 		return values.OrderBy(propertySelector);
 	}
 
+	public async Task<IEnumerable<T>> GetAllFromCache()
+	{
+		IEnumerable<T> entities = _memoryCache.Get<IEnumerable<T>>("caching");
 
+		if (entities is null)
+		{
+			entities = await GetAllAsync();
+
+			_memoryCache.Set("caching", entities, TimeSpan.FromMinutes(2));
+		}
+
+		return entities;
+	}
 }

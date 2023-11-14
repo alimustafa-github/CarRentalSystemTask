@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarRental.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231114060227_SeedDataToTheCarsTable")]
-    partial class SeedDataToTheCarsTable
+    [Migration("20231114102812_SeedDataintoCarsTable3")]
+    partial class SeedDataintoCarsTable3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

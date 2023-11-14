@@ -6,121 +6,118 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CarRental.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class SeedDataToTheCarsTable : Migration
+    public partial class SeedDataintoCarsTable4 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
-        {
+		{
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10001, "Sedan", 50.0m, (int)Color.Red, 2.0m, true });
+				values: new object[] { Guid.NewGuid(), 80001, "Sedan", 50.0m, (int)Color.Red, 2.0m, true });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10002, "SUV", 51.0m, (int)Color.Blue, 2.1m, false });
+				values: new object[] { Guid.NewGuid(), 80002, "SUV", 51.0m, (int)Color.Blue, 2.1m, false });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10003, "Truck", 52.0m, (int)Color.Green, 2.2m, true });
+				values: new object[] { Guid.NewGuid(), 80003, "Hatchback", 52.0m, (int)Color.Black, 2.2m, true });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10004, "Convertible", 53.0m, (int)Color.Yellow, 2.3m, false });
+				values: new object[] { Guid.NewGuid(), 80004, "Convertible", 55.0m, (int)Color.White, 2.5m, false });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10005, "Hatchback", 54.0m, (int)Color.White, 2.4m, true });
+				values: new object[] { Guid.NewGuid(), 80005, "Pickup", 60.0m, (int)Color.Green, 3.0m, true });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10006, "Sedan", 55.0m, (int)Color.Black, 2.5m, false });
+				values: new object[] { Guid.NewGuid(), 80006, "Minivan", 65.0m, (int)Color.Red, 3.5m, false });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10007, "SUV", 56.0m, (int)Color.Red, 2.6m, true });
+				values: new object[] { Guid.NewGuid(), 80007, "Coupe", 70.0m, (int)Color.Blue, 4.0m, true });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10008, "Truck", 57.0m, (int)Color.Blue, 2.7m, false });
+				values: new object[] { Guid.NewGuid(), 80008, "Sedan", 75.0m, (int)Color.Black, 4.5m, false });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10009, "Convertible", 58.0m, (int)Color.Green, 2.8m, true });
+				values: new object[] { Guid.NewGuid(), 80009, "SUV", 80.0m, (int)Color.White, 5.0m, true });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10010, "Hatchback", 59.0m, (int)Color.Yellow, 2.9m, false });
+				values: new object[] { Guid.NewGuid(), 80010, "Hatchback", 85.0m, (int)Color.Green, 5.5m, false });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10011, "Sedan", 60.0m, (int)Color.White, 3.0m, true });
+				values: new object[] { Guid.NewGuid(), 80011, "Convertible", 90.0m, (int)Color.Red, 6.0m, true });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10012, "SUV", 61.0m, (int)Color.Black, 3.1m, false });
+				values: new object[] { Guid.NewGuid(), 80012, "Pickup", 95.0m, (int)Color.Blue, 6.5m, false });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10013, "Truck", 62.0m, (int)Color.Red, 3.2m, true });
+				values: new object[] { Guid.NewGuid(), 80013, "Minivan", 100.0m, (int)Color.Black, 7.0m, true });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10014, "Convertible", 63.0m, (int)Color.Blue, 3.3m, false });
+				values: new object[] { Guid.NewGuid(), 80014, "Coupe", 105.0m, (int)Color.White, 7.5m, false });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10015, "Hatchback", 64.0m, (int)Color.Green, 3.4m, true });
+				values: new object[] { Guid.NewGuid(), 80015, "Sedan", 110.0m, (int)Color.Green, 8.0m, true });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10016, "Sedan", 65.0m, (int)Color.Yellow, 3.5m, false });
+				values: new object[] { Guid.NewGuid(), 80016, "SUV", 115.0m, (int)Color.Red, 8.5m, false });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10017, "SUV", 66.0m, (int)Color.White, 3.6m, true });
+				values: new object[] { Guid.NewGuid(), 80017, "Hatchback", 120.0m, (int)Color.Blue, 9.0m, true });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10018, "Truck", 67.0m, (int)Color.Black, 3.7m, false });
+				values: new object[] { Guid.NewGuid(), 80018, "Convertible", 125.0m, (int)Color.Black, 9.5m, false });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10019, "Convertible", 68.0m, (int)Color.Red, 3.8m, true });
+				values: new object[] { Guid.NewGuid(), 80019, "Pickup", 130.0m, (int)Color.White, 10.0m, true });
 
 			migrationBuilder.InsertData(
 				table: "Cars",
 				columns: new[] { "Id", "SerialNumber", "Type", "DailyFaire", "Color", "EngineCapacity", "WithDriver" },
-				values: new object[] { Guid.NewGuid(), 10020, "Hatchback", 69.0m, (int)Color.Blue, 3.9m, false });
-
+				values: new object[] { Guid.NewGuid(), 80020, "Minivan", 135.0m, (int)Color.Green, 10.5m, false });
 		}
 
 
-		/// <inheritdoc />
-		protected override void Down(MigrationBuilder migrationBuilder)
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
         {
-			migrationBuilder.DeleteData(
-				table: "Cars",
-				keyColumn: "Id",
-				keyValues: null); // This will delete all records
+			migrationBuilder.Sql("DELETE FROM Cars WHERE SerialNumber LIKE '800';");
+
 		}
-    }
+	}
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CarRental.Core.Interfaces;
+﻿namespace CarRental.Core.Interfaces;
 public interface IGenericRepository<T> where T : class
 {
 	Task<T> GetByIdAsync(object id);
@@ -13,6 +7,6 @@ public interface IGenericRepository<T> where T : class
 	void Update(T entity);
 	Task DeleteAsync(object id);
 
-
+	Task<IEnumerable<T>> GetAllFromCache();
 	Task<IEnumerable<T>> SortAsync(Func<T, IComparable> propertySelector);
 }
