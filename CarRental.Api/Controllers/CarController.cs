@@ -9,6 +9,11 @@ namespace CarRental.Api.Controllers;
 [ApiController]
 public class CarController : ControllerBase
 {
+	/// <summary>
+	/// I have used the unit of work to get to the cars methods 
+	/// I usually do it by create an interface like ICarService inside the Api project and then initialize by dependency injection and use it here
+	/// but I did it this way to simplify it as possible
+	/// </summary>
 	private readonly IUnitOfWork<Car> _carUnit;
 
 	public CarController(IUnitOfWork<Car> carUnit)
@@ -132,7 +137,7 @@ public class CarController : ControllerBase
 
 
 	[HttpPut("updatecar")]
-	public async Task<ApiResponse> update( [FromBody] CarDto carDto)
+	public async Task<ApiResponse> updateCar( [FromBody] CarDto carDto)
 	{
 
 		try
@@ -159,7 +164,7 @@ public class CarController : ControllerBase
 
 
 	[HttpDelete("deletecarbyid/{id}")]
-	public async Task<ApiResponse> deletecar(Guid id)
+	public async Task<ApiResponse> DeleteCar(Guid id)
 	{
 
 		try
@@ -230,6 +235,39 @@ public class CarController : ControllerBase
 			return new ApiResponse<IEnumerable<CarDto>>(false, Enumerable.Empty<CarDto>(), ex.Message);
 		}
 	}
+
+	/// <summary>
+	/// this method will get that all the cars that their serial number starts with provided prefix
+	/// </summary>
+	/// <param name="prefix">the prefix which the serial number starts with</param>
+	/// <returns></returns>
+
+	[HttpGet("getcarsbasedonserialnumber/{prefix}")]
+	public async Task<ApiResponse<IEnumerable<CarDto>>> GetCarsBasedOnSerialNumber(string prefix)
+	{
+		try
+		{
+			string propertyName = "SerialNumber";
+
+
+			var items = await _carUnit.Entity.GetItemsByPropertyPrefix(propertyName, prefix);
+			if (items is not null)
+			{
+				return new ApiResponse<IEnumerable<CarDto>>(true, items.ConvertToCarDto());
+
+			}
+			else
+			{
+				return new ApiResponse<IEnumerable<CarDto>>(false, Enumerable.Empty<CarDto>(), $"We do not have any cars in our systems which the serial number starts with {prefix}");
+
+			}
+		}
+		catch (Exception ex)	
+		{
+			return new ApiResponse<IEnumerable<CarDto>>(false, Enumerable.Empty<CarDto>(), ex.Message);
+		}
+	}
+
 
 
 

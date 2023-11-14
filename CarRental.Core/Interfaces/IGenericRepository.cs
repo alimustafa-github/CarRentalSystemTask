@@ -9,4 +9,12 @@ public interface IGenericRepository<T> where T : class
 
 	Task<IEnumerable<T>> GetAllFromCache();
 	Task<IEnumerable<T>> SortAsync(Func<T, IComparable> propertySelector);
+
+	/// <summary>
+	/// this method will get data from database based on the propertyName and the prefix which that property starts with
+	/// </summary>
+	/// <param name="propertyName"></param>
+	/// <param name="propertyValuePrefix"></param>
+	/// <returns></returns>
+	Task<IEnumerable<T>> GetItemsByPropertyPrefix(string propertyName, string propertyValuePrefix);
 }

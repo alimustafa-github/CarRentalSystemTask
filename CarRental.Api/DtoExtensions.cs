@@ -12,47 +12,72 @@ public static class DtoExtensions
 	
 	public static IEnumerable<CarDto> ConvertToCarDto(this IEnumerable<Car> cars)
 	{
-		return (from car in cars
-				select new CarDto
-				{
-					Id = car.Id,
-					Type = car.Type,
-					Color	= car.Color,
-					EngineCapacity = car.EngineCapacity,
-					DailyFaire = car.DailyFaire,
-					SerialNumber = car.SerialNumber,
-					WithDriver = car.WithDriver
-				}).ToList();
+		if (cars is not null)
+		{
+			return (from car in cars
+					select new CarDto
+					{
+						Id = car.Id,
+						Type = car.Type,
+						Color = car.Color,
+						EngineCapacity = car.EngineCapacity,
+						DailyFaire = car.DailyFaire,
+						SerialNumber = car.SerialNumber,
+						WithDriver = car.WithDriver
+					}).ToList();
+		}
+		else
+		{
+			return null;
+		}
+
 	}
 
 
 	public static CarDto ConvertToCarDto(this Car car)
 	{
-		return new CarDto
+		if (car is not not)
 		{
-			Id = car.Id,
-			Type = car.Type,
-			Color = car.Color,
-			EngineCapacity = car.EngineCapacity,
-			DailyFaire = car.DailyFaire,
-			SerialNumber = car.SerialNumber,
-			WithDriver = car.WithDriver
-		};
+			return new CarDto
+			{
+				Id = car.Id,
+				Type = car.Type,
+				Color = car.Color,
+				EngineCapacity = car.EngineCapacity,
+				DailyFaire = car.DailyFaire,
+				SerialNumber = car.SerialNumber,
+				WithDriver = car.WithDriver
+			};
+		}
+		else
+		{
+			return null;
+		}
+
+
 	}
 
 
 	public static Car ConvertToCar(this CarDto carDto)
 	{
-		return new Car
+		if (carDto is not null)
 		{
-			Id = carDto.Id,
-			Type = carDto.Type,
-			Color = carDto.Color,
-			EngineCapacity = carDto.EngineCapacity,
-			DailyFaire = carDto.DailyFaire,
-			SerialNumber = carDto.SerialNumber,
-			WithDriver = carDto.WithDriver
-		};
+			return new Car
+			{
+				Id = carDto.Id,
+				Type = carDto.Type,
+				Color = carDto.Color,
+				EngineCapacity = carDto.EngineCapacity,
+				DailyFaire = carDto.DailyFaire,
+				SerialNumber = carDto.SerialNumber,
+				WithDriver = carDto.WithDriver
+			};
+		}
+		else
+		{
+			return null;
+		}
+
 	}
 
 }

@@ -2,6 +2,7 @@
 using CarRental.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using System.Reflection;
 
 namespace CarRental.Infrastructure;
 public class GenericRepository<T> : IGenericRepository<T> where T : class
@@ -10,7 +11,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 	private readonly IMemoryCache _memoryCache;
 	private DbSet<T> _dbSet;
 
-	public GenericRepository(ApplicationDbContext context,IMemoryCache memoryCache)
+	public GenericRepository(ApplicationDbContext context, IMemoryCache memoryCache)
 	{
 		_context = context;
 		_memoryCache = memoryCache;
@@ -44,6 +45,12 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 		_dbSet.Entry(entity).State = EntityState.Modified;
 	}
 
+
+	/// <summary>
+	/// this method will sort the data based on the property we have provided as a lamdba expression
+	/// </summary>
+	/// <param name="propertySelector"></param>
+	/// <returns></returns>
 	public async Task<IEnumerable<T>> SortAsync(Func<T, IComparable> propertySelector)
 	{
 		IEnumerable<T> values = await GetAllAsync();
@@ -57,10 +64,29 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 		if (entities is null)
 		{
 			entities = await GetAllAsync();
-
+			//the data will stay in Cache for two minutes
 			_memoryCache.Set("caching", entities, TimeSpan.FromMinutes(2));
 		}
 
 		return entities;
+	}
+
+	public async Task<IEnumerable<T>> GetItemsByPropertyPrefix(string propertyName, string propertyValuePrefix)
+	{
+		var items = await _dbSet.ToListAsync();
+
+		var filteredItems = items
+			.Where(item =>
+			{
+				var propertyValue = GetPropertyValue(item, propertyName);
+				return propertyValue != null && propertyValue.ToString().StartsWith(propertyValuePrefix);
+			});
+
+		return filteredItems.ToList();
+	}
+	private object GetPropertyValue(object obj, string propertyName)
+	{
+		PropertyInfo property = obj.GetType().GetProperty(propertyName);
+		return property?.GetValue(obj);
 	}
 }
