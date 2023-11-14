@@ -16,5 +16,14 @@ public interface IGenericRepository<T> where T : class
 	/// <param name="propertyName"></param>
 	/// <param name="propertyValuePrefix"></param>
 	/// <returns></returns>
-	Task<IEnumerable<T>> GetItemsByPropertyPrefix(string propertyName, string propertyValuePrefix);
+	Task<IEnumerable<T>> GetItemsByPropertyPrefix(string propertyName, int propertyValuePrefix);
+
+	/// <summary>
+	/// this method search for a record in the database according to propert Name 
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="propertyName"></param>
+	/// <param name="propertyValue"></param>
+	/// <returns></returns>
+	Task<T> GetEntityByPropertyAsync(string propertyName, object propertyValue);
 }

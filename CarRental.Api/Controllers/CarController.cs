@@ -109,7 +109,7 @@ public class CarController : ControllerBase
 
 
 	[HttpPost("addcar")]
-	public async Task<ApiResponse> AddCar([FromBody] CarDto carDto)
+	public async Task<ApiResponse<CarDto>> AddCar([FromBody] CarDto carDto)
 	{
 
 		try
@@ -121,34 +121,33 @@ public class CarController : ControllerBase
 				var idExisted = cars.Any(c => c.Id == carDto.Id);
 				if (serialNumberExisted)
 				{
-					return new ApiResponse(false, $"The Serial Number you have provided {carDto.SerialNumber} is already exsists , try another one");
+					return new ApiResponse<CarDto>(false, null, $"The Serial Number you have provided {carDto.SerialNumber} is already exsists , try another one");
 				}
 				if (idExisted)
 				{
-					return new ApiResponse(false, $"The Id you have provided {carDto.Id} is already exsists , try another one or do not enter any Id (It is auto-generated field)");
+					return new ApiResponse<CarDto>(false, null, $"The Id you have provided {carDto.Id} is already exsists , try another one or do not enter any Id (It is auto-generated field)");
 				}
 				Car car = carDto.ConvertToCar();
 				await _carUnit.Entity.AddAsync(car);
 				await _carUnit.Save();
 
-				return new ApiResponse(true, "Car Added Successfully");
+				return new ApiResponse<CarDto>(true, carDto, "Car Added Successfully");
 			}
 			else
 			{
-				return new ApiResponse(false, "Could not insert the Car");
-
+				return new ApiResponse<CarDto>(false, null, "Could not insert the Car");
 			}
 		}
 		catch (Exception ex)
 		{
-			return new ApiResponse(false, ex.Message);
+			return new ApiResponse<CarDto>(false, null, ex.Message);
 		}
 	}
 
 
 
 	[HttpPut("updatecar")]
-	public async Task<ApiResponse> updateCar([FromBody] CarDto carDto)
+	public async Task<ApiResponse<CarDto>> updateCar([FromBody] CarDto carDto)
 	{
 
 		try
@@ -157,16 +156,11 @@ public class CarController : ControllerBase
 			{
 				IEnumerable<Car> cars = await _carUnit.Entity.GetAllFromCache();
 				var serialNumberExisted = cars.Any(c => c.SerialNumber == carDto.SerialNumber);
-				var idExisted = cars.Any(c => c.Id == carDto.Id);
 				if (serialNumberExisted)
 				{
-					return new ApiResponse(false, $"The Serial Number you have provided {carDto.SerialNumber} is already exsists , try another one");
+					return new ApiResponse<CarDto>(false, null, $"The Serial Number you have provided {carDto.SerialNumber} is already exsists , try another one");
 				}
-				if (idExisted)
-				{
-					return new ApiResponse(false, $"The Id you have provided {carDto.Id} is already exsists , try another one");
-				}
-
+			
 
 				Car car = carDto.ConvertToCar();
 
@@ -174,17 +168,17 @@ public class CarController : ControllerBase
 				_carUnit.Entity.Update(car);
 				await _carUnit.Save();
 
-				return new ApiResponse(true, "Car Updated Successfully");
+				return new ApiResponse<CarDto>(true, carDto, "Car Updated Successfully");
 			}
 			else
 			{
-				return new ApiResponse(false, "Could not Update the Car");
+				return new ApiResponse<CarDto>(false, null, "Could not Update the Car");
 
 			}
 		}
 		catch (Exception ex)
 		{
-			return new ApiResponse(false, ex.Message);
+			return new ApiResponse<CarDto>(false,null, ex.Message);
 		}
 	}
 
@@ -269,7 +263,7 @@ public class CarController : ControllerBase
 	/// <returns></returns>
 
 	[HttpGet("getcarsbasedonserialnumber/{prefix}")]
-	public async Task<ApiResponse<IEnumerable<CarDto>>> GetCarsBasedOnSerialNumber(string prefix)
+	public async Task<ApiResponse<IEnumerable<CarDto>>> GetCarsBasedOnSerialNumber(int prefix)
 	{
 		try
 		{
@@ -293,7 +287,31 @@ public class CarController : ControllerBase
 			return new ApiResponse<IEnumerable<CarDto>>(false, Enumerable.Empty<CarDto>(), ex.Message);
 		}
 	}
+	[HttpGet("searchbyserialnumber/{number}")]
+	public async Task<ApiResponse<CarDto>> SearchBySerialNumber(int number)
+	{
+		try
+		{
+			string propertyName = "SerialNumber";
 
+			Car car = await _carUnit.Entity.GetEntityByPropertyAsync(propertyName, number);
+
+			if (car is not null)
+			{
+				return new ApiResponse<CarDto>(true, car.ConvertToCarDto());
+
+			}
+			else
+			{
+				return new ApiResponse<CarDto>(false,null, $"We do not have any car in our systems which the serial number starts is {number}");
+
+			}
+		}
+		catch (Exception ex)
+		{
+			return new ApiResponse<CarDto>(false, null, ex.Message);
+		}
+	}
 
 
 
