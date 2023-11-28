@@ -1,8 +1,10 @@
 using AutoMapper;
 using CarRental.Api;
+using CarRental.Api.Services;
 using CarRental.Core.Interfaces;
 using CarRental.Infrastructure;
 using CarRental.Infrastructure.Data;
+using CarRental.Infrastructure.Data.EntitiesRepositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,13 +19,13 @@ builder.Services.AddSwaggerGen();
 //For using In-Memory Caching
 builder.Services.AddMemoryCache();
 
-builder.Services.AddScoped(typeof(EfCoreRepository<,>));
+builder.Services.AddScoped<EfCoreCarRepository>();
 
 IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
 builder.Services.AddSingleton(mapper);
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
+builder.Services.AddTransient<ICarService, CarService>();
 
 //Configure the program to work with sql database
 string connectionString = builder.Configuration.GetConnectionString("MyConnection");
@@ -38,7 +40,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-	ApplyPendingMigrations(app.Services);
+	//ApplyPendingMigrations(app.Services);
 	app.UseSwagger();
 	app.UseSwaggerUI();
 }

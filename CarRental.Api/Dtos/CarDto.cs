@@ -1,4 +1,6 @@
-﻿namespace CarRental.Api.Dtos;
+﻿using CarRental.Core;
+
+namespace CarRental.Api.Dtos;
 public class CarDto
 {
 	public Guid Id { get; set; }

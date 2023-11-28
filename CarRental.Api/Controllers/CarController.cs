@@ -1,64 +1,53 @@
-﻿using CarRental.Core.Dtos;
-using CarRental.Core.Entities;
-using CarRental.Core.Interfaces;
-using CarRental.Infrastructure.Data.EntitiesRepositories;
-using Microsoft.AspNetCore.Http;
+﻿using CarRental.Api.Dtos;
+using CarRental.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarRental.Api.Controllers;
 [Route("api/car")]
 [ApiController]
-public class CarController : BaseController<Car,EfCoreCarRepository>
+public class CarController : ControllerBase
 {
-	public CarController(EfCoreCarRepository repository) : base(repository)
-	{
+	private readonly ICarService _carService;
 
+	public CarController(ICarService carService)
+	{
+		_carService = carService;
 	}
 
-	[HttpGet("getallcars")]
-	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCars()
+	[HttpGet("getcars/{pagenumber}/{pagesize}")]
+	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCars(int pageNumber, int pagesize=15)
 	{
 		try
 		{
-			IEnumerable<Car> cars = await _carUnit.Entity.GetAllAsync();
-			IEnumerable<CarDto> carDtos = cars.ConvertToCarDto();
+			IEnumerable<CarDto> carDtos = await _carService.GetCarsAsync(pageNumber, pagesize);	
 
 			if (carDtos != null)
 			{
-				return new ApiResponse<IEnumerable<CarDto>>(true, carDtos);
+				return new ApiResponse<IEnumerable<CarDto>>
+				{
+					IsSuccess = true,
+					Data = carDtos,
+					Message = string.Empty
+				};
 			}
 			else
 			{
-				return new ApiResponse<IEnumerable<CarDto>>(true, Enumerable.Empty<CarDto>(), "We do not currently have any cars in our system");
+				return new ApiResponse<IEnumerable<CarDto>>
+				{
+					IsSuccess = true,
+					Data = null,
+					Message = "We do not have any cars"
+				};
 			}
 		}
 		catch (Exception ex)
 		{
-			return new ApiResponse<IEnumerable<CarDto>>(false, Enumerable.Empty<CarDto>(), ex.Message);
-		}
-	}
-
-
-	[HttpGet("getallcarsfromcache")]
-	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCarsFromCache()
-	{
-		try
-		{
-			IEnumerable<Car> cars = await _carUnit.Entity.GetAllFromCache();
-			IEnumerable<CarDto> carDtos = cars.ConvertToCarDto();
-
-			if (carDtos != null)
+			return new ApiResponse<IEnumerable<CarDto>>
 			{
-				return new ApiResponse<IEnumerable<CarDto>>(true, carDtos);
-			}
-			else
-			{
-				return new ApiResponse<IEnumerable<CarDto>>(true, Enumerable.Empty<CarDto>(), "We do not currently have any cars in our system");
-			}
-		}
-		catch (Exception ex)
-		{
-			return new ApiResponse<IEnumerable<CarDto>>(false, Enumerable.Empty<CarDto>(), ex.Message);
+				IsSuccess = false,
+				Data = Enumerable.Empty<CarDto>(),
+				Message = ex.Message
+			};
 		}
 	}
 
@@ -69,31 +58,34 @@ public class CarController : BaseController<Car,EfCoreCarRepository>
 	{
 		try
 		{
-			Car car = await _carUnit.Entity.GetByIdAsync(id);
-			if (car != null)
+			CarDto carDto = await _carService.GetCarByIdAsync(id);
+			if (carDto != null)
 			{
-				CarDto carDto = car.ConvertToCarDto();
-
-				if (carDto != null)
+				return new ApiResponse<CarDto>
 				{
-					return new ApiResponse<CarDto>(true, carDto);
-				}
-				else
-				{
-					return new ApiResponse<CarDto>(false, null, "Could not find the car");
-				}
-
+					IsSuccess = true,
+					Data = carDto
+				};
 			}
 			else
 			{
-				return new ApiResponse<CarDto>(false, null, "you have entered an invalid identifier");
-
+				return new ApiResponse<CarDto>()
+				{
+					IsSuccess = false,
+					Data = null,
+					Message = "you have entered an invalid identifier"
+				};
 			}
 
 		}
 		catch (Exception ex)
 		{
-			return new ApiResponse<CarDto>(false, null, ex.Message);
+			return new ApiResponse<CarDto>()
+			{
+				IsSuccess = false,
+				Data = null,
+				Message = ex.Message
+			};
 		}
 	}
 
@@ -109,31 +101,32 @@ public class CarController : BaseController<Car,EfCoreCarRepository>
 		{
 			if (carDto != null)
 			{
-				IEnumerable<Car> cars = await _carUnit.Entity.GetAllFromCache();
-				var serialNumberExisted = cars.Any(c => c.SerialNumber == carDto.SerialNumber);
-				var idExisted = cars.Any(c => c.Id == carDto.Id);
-				if (serialNumberExisted)
+				carDto = await _carService.AddCarAsync(carDto);
+				return new ApiResponse<CarDto>
 				{
-					return new ApiResponse<CarDto>(false, null, $"The Serial Number you have provided {carDto.SerialNumber} is already exsists , try another one");
-				}
-				if (idExisted)
-				{
-					return new ApiResponse<CarDto>(false, null, $"The Id you have provided {carDto.Id} is already exsists , try another one or do not enter any Id (It is auto-generated field)");
-				}
-				Car car = carDto.ConvertToCar();
-				await _carUnit.Entity.AddAsync(car);
-				await _carUnit.Save();
-
-				return new ApiResponse<CarDto>(true, carDto, "Car Added Successfully");
+					IsSuccess = true,
+					Data = carDto,
+					Message = "Car Added Successfully"
+				};
 			}
 			else
 			{
-				return new ApiResponse<CarDto>(false, null, "Could not insert the Car");
+				return new ApiResponse<CarDto>
+				{
+					IsSuccess = false,
+					Data = null,
+					Message = "Could not Add the Car"
+				};
 			}
 		}
 		catch (Exception ex)
 		{
-			return new ApiResponse<CarDto>(false, null, ex.Message);
+			return new ApiResponse<CarDto>
+			{
+				IsSuccess = false,
+				Data = null,
+				Message = ex.Message
+			};
 		}
 	}
 
@@ -147,162 +140,163 @@ public class CarController : BaseController<Car,EfCoreCarRepository>
 		{
 			if (carDto != null)
 			{
-				IEnumerable<Car> cars = await _carUnit.Entity.GetAllFromCache();
-				var serialNumberExisted = cars.Any(c => c.SerialNumber == carDto.SerialNumber);
-				if (serialNumberExisted)
+				carDto = await _carService.UpdateCarAsync(carDto);
+				return new ApiResponse<CarDto>
 				{
-					return new ApiResponse<CarDto>(false, null, $"The Serial Number you have provided {carDto.SerialNumber} is already exsists , try another one");
-				}
-			
-
-				Car car = carDto.ConvertToCar();
-
-
-				_carUnit.Entity.Update(car);
-				await _carUnit.Save();
-
-				return new ApiResponse<CarDto>(true, carDto, "Car Updated Successfully");
+					IsSuccess = true,
+					Data = carDto,
+					Message = "Car Updated Successfully"
+				};
 			}
 			else
 			{
-				return new ApiResponse<CarDto>(false, null, "Could not Update the Car");
-
+				return new ApiResponse<CarDto>
+				{
+					IsSuccess = false,
+					Data = null,
+					Message = "Could not update the car"
+				};
 			}
 		}
 		catch (Exception ex)
 		{
-			return new ApiResponse<CarDto>(false,null, ex.Message);
+			return new ApiResponse<CarDto>
+			{
+				IsSuccess = false,
+				Data = null,
+				Message = ex.Message
+			};
 		}
 	}
 
 
 	[HttpDelete("deletecarbyid/{id}")]
-	public async Task<ApiResponse> DeleteCar(Guid id)
+	public async Task<ApiResponse<CarDto>> DeleteCar(Guid id)
 	{
 
 		try
 		{
 			if (!string.IsNullOrWhiteSpace(id.ToString()))
 			{
-				await _carUnit.Entity.DeleteAsync(id);
-				await _carUnit.Save();
+				CarDto carDto = await _carService.DeleteCarAsync(id);
+				if (carDto is not null)
+				{
+					return new ApiResponse<CarDto>
+					{
+						IsSuccess = true,
+						Data = carDto,
+						Message = "Car Deleted Successfully"
+					};
+				}
+				else
+				{
+					return new ApiResponse<CarDto>
+					{
+						IsSuccess = false,
+						Data = null,
+						Message = "there is no car corresponds to the entered identifier"
+					};
+				}
 
-				return new ApiResponse(true, "Car Deleted Successfully");
 			}
 			else
 			{
-				return new ApiResponse(false, "Invalid Id");
-
+				return new ApiResponse<CarDto>
+				{
+					IsSuccess = false,
+					Data = null,
+					Message = "Could not Delete the Car"
+				};
 			}
 		}
 		catch (Exception ex)
 		{
-			return new ApiResponse(false, ex.Message);
+			return new ApiResponse<CarDto>
+			{ 
+				IsSuccess = false,
+				Data = null,
+				Message = ex.Message
+			};
 		}
 	}
 
 
 
-	[HttpGet("sortcarsbyserialnumber")]
-	public async Task<ApiResponse<IEnumerable<CarDto>>> SortTheCarsBySerialNumber()
+	[HttpGet("sortcarsbyserialnumber/{pagenumber}/{pagesize}")]
+	public async Task<ApiResponse<IEnumerable<CarDto>>> SortTheCarsBySerialNumber(int pagenumber, int pagesize = 15)
 	{
 		try
 		{
-			IEnumerable<Car> cars = await _carUnit.Entity.SortAsync(car => car.SerialNumber);
-			IEnumerable<CarDto> carDtos = cars.ConvertToCarDto();
-
+			IEnumerable<CarDto> carDtos = await _carService.SortCarsBySerialNumber(pagenumber, pagesize);	
 			if (carDtos != null)
 			{
-				return new ApiResponse<IEnumerable<CarDto>>(true, carDtos);
+
+				return new ApiResponse<IEnumerable<CarDto>>
+				{
+					IsSuccess = true,
+					Data = carDtos,
+					Message = string.Empty
+				};
 			}
 			else
 			{
-				return new ApiResponse<IEnumerable<CarDto>>(true, Enumerable.Empty<CarDto>(), "We do not currently have any cars in our system");
+
+				return new ApiResponse<IEnumerable<CarDto>>
+				{
+					IsSuccess = false,
+					Data = null,
+					Message = "We do not have any cars in out system"
+				};
 			}
 		}
 		catch (Exception ex)
 		{
-			return new ApiResponse<IEnumerable<CarDto>>(false, Enumerable.Empty<CarDto>(), ex.Message);
+
+			return new ApiResponse<IEnumerable<CarDto>>
+			{
+				IsSuccess = false,
+				Data = Enumerable.Empty<CarDto>(),
+				Message = ex.Message
+			};
 		}
 	}
 
-	[HttpGet("sortcarsbyidentifier")]
-	public async Task<ApiResponse<IEnumerable<CarDto>>> SortTheCarsById()
-	{
-		try
-		{
-			IEnumerable<Car> cars = await _carUnit.Entity.SortAsync(car => car.Id);
-			IEnumerable<CarDto> carDtos = cars.ConvertToCarDto();
-
-			if (carDtos != null)
-			{
-				return new ApiResponse<IEnumerable<CarDto>>(true, carDtos);
-			}
-			else
-			{
-				return new ApiResponse<IEnumerable<CarDto>>(true, Enumerable.Empty<CarDto>(), "We do not currently have any cars in our system");
-			}
-		}
-		catch (Exception ex)
-		{
-			return new ApiResponse<IEnumerable<CarDto>>(false, Enumerable.Empty<CarDto>(), ex.Message);
-		}
-	}
-
-	/// <summary>
-	/// this method will get that all the cars that their serial number starts with provided prefix
-	/// </summary>
-	/// <param name="prefix">the prefix which the serial number starts with</param>
-	/// <returns></returns>
-
-	[HttpGet("getcarsbasedonserialnumber/{prefix}")]
-	public async Task<ApiResponse<IEnumerable<CarDto>>> GetCarsBasedOnSerialNumber(int prefix)
-	{
-		try
-		{
-			string propertyName = "SerialNumber";
 
 
-			var items = await _carUnit.Entity.GetItemsByPropertyPrefix(propertyName, prefix);
-			if (items is not null)
-			{
-				return new ApiResponse<IEnumerable<CarDto>>(true, items.ConvertToCarDto());
-
-			}
-			else
-			{
-				return new ApiResponse<IEnumerable<CarDto>>(false, Enumerable.Empty<CarDto>(), $"We do not have any cars in our systems which the serial number starts with {prefix}");
-
-			}
-		}
-		catch (Exception ex)
-		{
-			return new ApiResponse<IEnumerable<CarDto>>(false, Enumerable.Empty<CarDto>(), ex.Message);
-		}
-	}
 	[HttpGet("searchbyserialnumber/{number}")]
 	public async Task<ApiResponse<CarDto>> SearchBySerialNumber(int number)
 	{
 		try
 		{
-			string propertyName = "SerialNumber";
+			CarDto carDto = await _carService.SearchForCarBySerialNumberAsync(number);
 
-			Car car = await _carUnit.Entity.GetEntityByPropertyAsync(propertyName, number);
-
-			if (car is not null)
+			if (carDto is not null)
 			{
-				return new ApiResponse<CarDto>(true, car.ConvertToCarDto());
-
+				return new ApiResponse<CarDto>
+				{
+					IsSuccess = true,
+					Data = carDto,
+					Message = string.Empty
+				};
 			}
 			else
 			{
-				return new ApiResponse<CarDto>(false,null, $"We do not have any car in our systems which the serial number starts is {number}");
-
+				return new ApiResponse<CarDto>
+				{
+					IsSuccess = false,
+					Data = null,
+					Message = "Could not find the car"
+				};
 			}
 		}
 		catch (Exception ex)
 		{
-			return new ApiResponse<CarDto>(false, null, ex.Message);
+			return new ApiResponse<CarDto>
+			{
+				IsSuccess = false,
+				Data = null,
+				Message = ex.Message
+			};
 		}
 	}
 

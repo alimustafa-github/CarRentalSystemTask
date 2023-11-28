@@ -1,5 +1,10 @@
 ﻿namespace CarRental.Api;
 
 
-public record ApiResponse<TData>(bool IsSuccess, TData Data, string? Message = null);
-public record ApiResponse(bool IsSuccess, string? Message);
+public record ApiResponse<TData>
+{
+    public bool IsSuccess { get; set; }
+    public TData Data { get; set; } 
+    public string? Message { get; set; } = string.Empty;
+}
+
