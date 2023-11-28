@@ -1,5 +1,5 @@
 ﻿namespace CarRental.Core.Entities;
-public class RentedCar
+public class RentedCar : IEntityBase
 {
     public Guid Id { get; set; }
 
@@ -8,4 +8,8 @@ public class RentedCar
 
     public Guid CarId { get; set; }
     public Car Car { get; set; }
+
+    public Guid CustomerId { get; set; }
+    public Customer Customer { get; set; }
+
 }

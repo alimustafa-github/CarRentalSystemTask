@@ -1,26 +1,19 @@
 ﻿using CarRental.Core.Dtos;
 using CarRental.Core.Entities;
 using CarRental.Core.Interfaces;
+using CarRental.Infrastructure.Data.EntitiesRepositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarRental.Api.Controllers;
 [Route("api/car")]
 [ApiController]
-public class CarController : ControllerBase
+public class CarController : BaseController<Car,EfCoreCarRepository>
 {
-	/// <summary>
-	/// I have used the unit of work to get to the cars methods 
-	/// I usually do it by create an interface like ICarService inside the Api project and then initialize by dependency injection and use it here
-	/// but I did it this way to simplify it as possible
-	/// </summary>
-	private readonly IUnitOfWork<Car> _carUnit;
-
-	public CarController(IUnitOfWork<Car> carUnit)
+	public CarController(EfCoreCarRepository repository) : base(repository)
 	{
-		_carUnit = carUnit;
-	}
 
+	}
 
 	[HttpGet("getallcars")]
 	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCars()

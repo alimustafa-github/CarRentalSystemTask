@@ -1,3 +1,4 @@
+using AutoMapper;
 using CarRental.Api;
 using CarRental.Core.Interfaces;
 using CarRental.Infrastructure;
@@ -16,7 +17,13 @@ builder.Services.AddSwaggerGen();
 //For using In-Memory Caching
 builder.Services.AddMemoryCache();
 
-builder.Services.AddScoped(typeof(IUnitOfWork<>), typeof(UnitOfWork<>));
+builder.Services.AddScoped(typeof(EfCoreRepository<,>));
+
+IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
+builder.Services.AddSingleton(mapper);
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 
 //Configure the program to work with sql database
 string connectionString = builder.Configuration.GetConnectionString("MyConnection");
