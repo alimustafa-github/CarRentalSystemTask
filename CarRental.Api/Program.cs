@@ -5,6 +5,8 @@ using CarRental.Core.Interfaces;
 using CarRental.Infrastructure;
 using CarRental.Infrastructure.Data;
 using CarRental.Infrastructure.Data.EntitiesRepositories;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,18 +21,27 @@ builder.Services.AddSwaggerGen();
 //For using In-Memory Caching
 builder.Services.AddMemoryCache();
 
-builder.Services.AddScoped<EfCoreCarRepository>();
 
+//Registering the AutoMapper
 IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
 builder.Services.AddSingleton(mapper);
-
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+
+//Register the fluent Validation as a serivce
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+//Register our Custom serivces here
 builder.Services.AddTransient<ICarService, CarService>();
+builder.Services.AddScoped<EfCoreCarRepository>();
 
 //Configure the program to work with sql database
 string connectionString = builder.Configuration.GetConnectionString("MyConnection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+
+
 
 
 var app = builder.Build();
