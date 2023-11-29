@@ -4,13 +4,13 @@ namespace CarRental.Core.Interfaces;
 public interface IRepository<T> where T : class,IEntityBase
 {
 	Task<T> GetByIdAsync(object id);
-	Task<IEnumerable<T>> GetAllAsync();
+	Task<IEnumerable<T>> GetAllAsync(int pageNumber , int pageSize);
 	Task<T> AddAsync(T entity);
 	Task<T> UpdateAsync(T entity);
 	Task<T> DeleteAsync(object id);
 
-	Task<IEnumerable<T>> GetFromCacheAsync();
-	Task<IEnumerable<T>> SortAsync(Func<T, IComparable> propertySelector);
+	Task<IEnumerable<T>> GetFromCacheAsync(int pageNumber,int pageSize);
+	Task<IEnumerable<T>> SortAsync(Func<T, IComparable> propertySelector , int pageNumber , int pageSize);
 
 
 

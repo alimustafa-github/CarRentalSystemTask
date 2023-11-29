@@ -43,9 +43,11 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 		return await _context.Set<TEntity>().FindAsync(id);
 	}
 
-	public async Task<IEnumerable<TEntity>> GetAllAsync()
+	public async Task<IEnumerable<TEntity>> GetAllAsync(int pageNumber, int pageSize)
 	{
-		return await _context.Set<TEntity>().AsNoTracking().ToListAsync();
+		int recordsToSkip = (pageNumber - 1) * pageSize;
+
+		return await _context.Set<TEntity>().AsNoTracking().Skip(recordsToSkip).Take(pageSize).ToListAsync();
 	}
 
 	public async Task<TEntity> UpdateAsync(TEntity entity)
@@ -55,13 +57,13 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 		return entity;
 	}
 
-	public async Task<IEnumerable<TEntity>> GetFromCacheAsync()
+	public async Task<IEnumerable<TEntity>> GetFromCacheAsync(int pageNumber, int pageSize)
 	{
 		IEnumerable<TEntity> entities = _memoryCache.Get<IEnumerable<TEntity>>("caching");
 
 		if (entities is null)
 		{
-			entities = await GetAllAsync();
+			entities = await GetAllAsync(pageNumber, pageSize);
 			//the data will stay in Cache for two minutes
 			_memoryCache.Set("caching", entities, TimeSpan.FromMinutes(2));
 		}
@@ -75,10 +77,11 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 	/// </summary>
 	/// <param name="propertySelector"></param>
 	/// <returns></returns>
-	public async Task<IEnumerable<TEntity>> SortAsync(Func<TEntity, IComparable> propertySelector)
+	public async Task<IEnumerable<TEntity>> SortAsync(Func<TEntity, IComparable> propertySelector, int pageNumber, int pageSize)
 	{
-		IEnumerable<TEntity> values = await GetAllAsync();
-		return values.OrderBy(propertySelector);
+		int recordsToSkip = (pageNumber - 1) * pageSize;
+		IEnumerable<TEntity> values = _context.Set<TEntity>().AsQueryable().OrderBy(propertySelector).Skip(recordsToSkip).Take(pageSize);
+		return values;
 	}
 
 	public async Task<TEntity> SearchForEntityAsync(string propertyName, object propertyValue)
