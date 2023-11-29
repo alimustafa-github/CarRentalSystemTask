@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace CarRental.Infrastructure.Data;
 public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
-	where TEntity : class, IEntityBase
+	where TEntity : class
 	where TContext : DbContext
 {
 	private readonly TContext _context;

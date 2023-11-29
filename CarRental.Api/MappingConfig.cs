@@ -11,6 +11,7 @@ public class MappingConfig
 		var mappingConfig = new MapperConfiguration(config =>
 		{
 			config.CreateMap<Car, CarDto>().ReverseMap();
+			config.CreateMap<ApplicationUser,RegistrationRequestDto>().ReverseMap();
 		});
 
 		return mappingConfig;

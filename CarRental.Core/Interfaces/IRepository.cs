@@ -1,7 +1,7 @@
 ﻿using CarRental.Core.Entities;
 
 namespace CarRental.Core.Interfaces;
-public interface IRepository<T> where T : class,IEntityBase
+public interface IRepository<T> where T : class
 {
 	Task<T> GetByIdAsync(object id);
 	Task<IEnumerable<T>> GetAllAsync(int pageNumber , int pageSize);

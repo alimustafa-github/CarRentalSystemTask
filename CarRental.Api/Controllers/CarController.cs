@@ -1,10 +1,12 @@
 ﻿using CarRental.Api.Dtos;
-using CarRental.Api.Services;
+using CarRental.Api.Services.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarRental.Api.Controllers;
 [Route("api/car")]
 [ApiController]
+[Authorize]
 public class CarController : ControllerBase
 {
 	private readonly ICarService _carService;

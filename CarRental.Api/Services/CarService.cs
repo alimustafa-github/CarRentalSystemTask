@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CarRental.Api.Dtos;
+using CarRental.Api.Services.IService;
 using CarRental.Core.Entities;
 using CarRental.Infrastructure.Data.EntitiesRepositories;
 using Microsoft.EntityFrameworkCore;
