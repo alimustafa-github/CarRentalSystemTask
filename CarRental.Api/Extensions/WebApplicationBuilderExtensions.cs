@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CarRental.Api.Extensions;
 
-public static class WebApplicationBuilderExtenssions
+public static class WebApplicationBuilderExtensions
 {
 	public static WebApplicationBuilder AddAppAuthentication(this WebApplicationBuilder builder)
 	{
