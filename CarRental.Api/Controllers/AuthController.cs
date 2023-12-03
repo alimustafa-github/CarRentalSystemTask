@@ -1,5 +1,7 @@
 ﻿using CarRental.Api.Dtos;
 using CarRental.Api.Services.IService;
+using CarRental.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +13,7 @@ public class AuthController : ControllerBase
 	private readonly IAuthService _authService;
 
 	public AuthController(IAuthService authService)
-    {
+	{
 		_authService = authService;
 	}
 
@@ -58,4 +60,56 @@ public class AuthController : ControllerBase
 			Message = "You have successfully authenticated"
 		};
 	}
+
+
+
+	[Authorize(Roles = nameof(AppRoles.Admin))]
+	[HttpPost("assignrole/{email}/{role}")]
+	public async Task<ApiResponse<bool>> AssignRole(string email, string role)
+	{
+		bool result = await _authService.AssignRoleAsync(email, role);
+		if (result)
+		{
+			return new ApiResponse<bool>
+			{
+				IsSuccess = true,
+				Message = "Role Assigned Successfully"
+			};
+		}
+		else
+		{
+			return new ApiResponse<bool>
+			{
+				IsSuccess = false,
+				Message = "Could not assign role , Please check that the email or the role name is correct"
+			};
+		}
+
+	}
+	[Authorize(Roles = nameof(AppRoles.Admin))]
+	[HttpPost("removerole/{email}/{role}")]
+	public async Task<ApiResponse<bool>> RemoveRole(string email, string role)
+	{
+		bool result = await _authService.RemoveRoleAsync(email, role);
+		if (result)
+		{
+			return new ApiResponse<bool>
+			{
+				IsSuccess = true,
+				Message = "Role Removed Successfully"
+			};
+		}
+		else
+		{
+			return new ApiResponse<bool>
+			{
+				IsSuccess = false,
+				Message = "Could not remove role , Please check that the email or the role name is correct"
+			};
+		}
+
+	}
+
+
+
 }

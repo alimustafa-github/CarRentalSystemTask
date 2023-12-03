@@ -87,4 +87,54 @@ public class AuthService : IAuthService
 	}
 
 
+	public async Task<bool> AddRoleAsync(string roleName)
+	{
+		try
+		{
+			// Check if the role already exists
+			if (!await _roleManager.RoleExistsAsync(roleName))
+			{
+				var result = await _roleManager.CreateAsync(new IdentityRole(roleName));
+
+				return result.Succeeded;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		catch (ArgumentNullException ex)
+		{
+			//todo : log this error
+			return false;
+		}
+
+	}
+
+
+
+
+	public async Task<bool> RemoveRoleAsync(string email, string roleName)
+	{
+		var user = await _userManager.FindByEmailAsync(email);
+
+		if (user is not null && await _roleManager.RoleExistsAsync(roleName))
+		{
+			var result = await _userManager.RemoveFromRoleAsync(user, roleName);
+
+			if (result.Succeeded)
+			{
+				return true;
+			}
+			else
+			{
+				//todo : Log the errors as needed
+				return false;
+			}
+		}
+
+		// User not found or role does not exist
+		return false;
+	}
+
 }

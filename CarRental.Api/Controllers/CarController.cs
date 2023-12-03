@@ -17,11 +17,11 @@ public class CarController : ControllerBase
 	}
 
 	[HttpGet("getcars/{pagenumber}/{pagesize}")]
-	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCars(int pageNumber, int pagesize=15)
+	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCars(int pagenumber, int pagesize=15)
 	{
 		try
 		{
-			IEnumerable<CarDto> carDtos = await _carService.GetCarsAsync(pageNumber, pagesize);	
+			IEnumerable<CarDto> carDtos = await _carService.GetCarsAsync(pagenumber, pagesize);	
 
 			if (carDtos != null)
 			{
@@ -38,7 +38,7 @@ public class CarController : ControllerBase
 				{
 					IsSuccess = true,
 					Data = null,
-					Message = "We do not have any cars"
+					Message = "We do not have any cars",
 				};
 			}
 		}

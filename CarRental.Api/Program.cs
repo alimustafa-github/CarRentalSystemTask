@@ -43,6 +43,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddTransient<EfCoreCarRepository>();
 builder.Services.AddTransient<EfCoreUserRepository>();
 
+//builder.Services.AddTransient(typeof(EfCoreRepository<,>));
+
 
 //Register the serivces for JWT
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("ApiSettings:JwtOptions"));
