@@ -10,5 +10,9 @@ public interface IAuthService
 	Task<bool> AssignRoleAsync(string email, string roleName);
 
 	Task<bool> RemoveRoleAsync(string email, string roleName);
+	Task<RoleDto> AddRoleAsync(RoleDto roleDto);
+
+	Task<IEnumerable<RoleDto>> GetRolesAsync();
+
 
 }

@@ -13,8 +13,11 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 	private string tableName = "ApplicationUsers";
 	public void Configure(EntityTypeBuilder<ApplicationUser> builder)
 	{
-		builder.Property(u => u.FirstName).IsRequired().HasMaxLength(25);
-		builder.Property(u => u.LastName).IsRequired().HasMaxLength(25);
 		builder.ToTable(tableName);
+
+		builder.Property(u => u.FirstName).IsRequired().HasMaxLength(12);
+		builder.Property(u => u.LastName).IsRequired().HasMaxLength(12);
+
+
 	}
 }

@@ -17,22 +17,27 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 	public DbSet<Driver> Drivers { get; set; }
 	public DbSet<RentedCar> RentedCars { get; set; }
 	public DbSet<Customer> Customers { get; set; }
-	public static DbSet<ApplicationUser> ApplicationUsers { get; set; }
-	public static DbSet<IdentityRole> ApplicationRoles { get; set; }
-	public static DbSet<IdentityUserRole<string>> ApplicationUserRoles { get; set; }
-	public static DbSet<IdentityUserClaim<string>> ApplicationUserClaims { get; set; }
-	public static DbSet<IdentityRoleClaim<string>> ApplicationRoleClaims { get; set; }
-	public static DbSet<IdentityUserLogin<string>> ApplicationUserLogins { get; set; }
-	public static DbSet<IdentityUserToken<string>> ApplicationUserTokens { get; set; }
+    public DbSet<CarType> CarTypes { get; set; }
+    public DbSet<Membership> Memberships { get; set; }
+
+    public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+	public DbSet<IdentityRole> ApplicationRoles { get; set; }
+	public DbSet<IdentityUserRole<string>> ApplicationUserRoles { get; set; }
+	public DbSet<IdentityUserClaim<string>> ApplicationUserClaims { get; set; }
+	public DbSet<IdentityRoleClaim<string>> ApplicationRoleClaims { get; set; }
+	public DbSet<IdentityUserLogin<string>> ApplicationUserLogins { get; set; }
+	public DbSet<IdentityUserToken<string>> ApplicationUserTokens { get; set; }
+
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		base.OnModelCreating(modelBuilder);
 
-		//Configure the Tables 
 		modelBuilder.ApplyConfiguration(new CarConfiguration());
 		modelBuilder.ApplyConfiguration(new DriverConfiguration());
 		modelBuilder.ApplyConfiguration(new RentedCarConfiguration());
 		modelBuilder.ApplyConfiguration(new CustomerConfiguration());
+		modelBuilder.ApplyConfiguration(new CarTypeConfiguration());
+		modelBuilder.ApplyConfiguration(new MembershipConfiguration());
 
 		ApplyIdentityTablesConfigurations(modelBuilder);
 	}

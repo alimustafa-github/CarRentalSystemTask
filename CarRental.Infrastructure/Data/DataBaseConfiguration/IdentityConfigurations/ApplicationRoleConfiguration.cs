@@ -11,5 +11,6 @@ public class ApplicationRoleConfiguration : IEntityTypeConfiguration<IdentityRol
 	public void Configure(EntityTypeBuilder<IdentityRole> builder)
 	{
 		builder.ToTable(tableName);
+		builder.Property(role => role.Name).IsRequired(true);
 	}
 }

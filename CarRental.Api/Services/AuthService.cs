@@ -87,26 +87,30 @@ public class AuthService : IAuthService
 	}
 
 
-	public async Task<bool> AddRoleAsync(string roleName)
+	public async Task<RoleDto> AddRoleAsync(RoleDto roleDto)
 	{
 		try
 		{
 			// Check if the role already exists
-			if (!await _roleManager.RoleExistsAsync(roleName))
+			if (!await _roleManager.RoleExistsAsync(roleDto.Name))
 			{
-				var result = await _roleManager.CreateAsync(new IdentityRole(roleName));
+				var result = await _roleManager.CreateAsync(new IdentityRole(roleDto.Name));
 
-				return result.Succeeded;
+				if (result.Succeeded)
+				{
+					return roleDto;
+				}
+				return null;
 			}
 			else
 			{
-				return false;
+				return null;
 			}
 		}
 		catch (ArgumentNullException ex)
 		{
 			//todo : log this error
-			return false;
+			return null;
 		}
 
 	}
@@ -137,4 +141,10 @@ public class AuthService : IAuthService
 		return false;
 	}
 
+	public async Task<IEnumerable<RoleDto>> GetRolesAsync()
+	{
+		IEnumerable<RoleDto> roleDtos = _mapper.Map<IEnumerable<RoleDto>>(await _roleManager.Roles.ToListAsync());
+
+		return roleDtos;
+	}
 }

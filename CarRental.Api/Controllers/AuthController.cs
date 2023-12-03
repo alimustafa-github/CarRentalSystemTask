@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarRental.Api.Controllers;
-[Route("api/[controller]")]
+[Route("api/authentication")]
 [ApiController]
 public class AuthController : ControllerBase
 {
@@ -105,6 +105,34 @@ public class AuthController : ControllerBase
 			{
 				IsSuccess = false,
 				Message = "Could not remove role , Please check that the email or the role name is correct"
+			};
+		}
+
+	}
+
+
+
+	[Authorize(Roles = "Admin")]
+	[HttpPost("addrole")]
+	public async Task<ApiResponse<RoleDto>> AddRole([FromBody] RoleDto roleDto)
+	{
+		RoleDto result = await _authService.AddRoleAsync(roleDto);
+		if (result is not null)
+		{
+			return new ApiResponse<RoleDto>
+			{
+				IsSuccess = true,
+				Data = roleDto,
+				Message = "Role Created Successfully"
+			};
+		}
+		else
+		{
+			return new ApiResponse<RoleDto>
+			{
+				IsSuccess = false,
+				Data = null,
+				Message = "Could not Create role "
 			};
 		}
 
