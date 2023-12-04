@@ -1,6 +1,4 @@
-﻿using CarRental.Api.Dtos.CarDtos;
-
-namespace CarRental.Api.Services.IService;
+﻿namespace CarRental.Api.Services.IService;
 public interface ICarService
 {
 	Task<CarDto> AddCarAsync(AddCarDto carDto);
@@ -10,4 +8,7 @@ public interface ICarService
 	Task<IEnumerable<CarDto>> SortCarsBySerialNumber(int numberToSkip, int numberToTake);
 	Task<CarDto> UpdateCarAsync(object carId, UpdateCarDto carDto);
 	Task<CarDto> GetCarByIdAsync(Guid id);
+
+	Task<IEnumerable<CarDto>> FilterTheCarsBySerialNumber(string value);
+
 }

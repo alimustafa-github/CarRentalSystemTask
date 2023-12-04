@@ -1,7 +1,4 @@
-﻿using CarRental.Api.Dtos.CustomerDtos;
-using FluentValidation;
-
-namespace CarRental.Api.Validations;
+﻿namespace CarRental.Api.Validations;
 
 public class CustomerDtoValidator : AbstractValidator<CustomerDto>
 {

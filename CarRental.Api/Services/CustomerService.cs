@@ -1,5 +1,4 @@
-﻿
-namespace CarRental.Api.Services;
+﻿namespace CarRental.Api.Services;
 
 public class CustomerService : ICustomerService
 {
@@ -18,12 +17,12 @@ public class CustomerService : ICustomerService
 		return _mapper.Map<IEnumerable<CustomerDto>>(customers);
 	}
 
-	public async Task<CarDto> GetCustomerByIdAsync(object id)
+	public async Task<CustomerDto> GetCustomerByIdAsync(object id)
 	{
 		Customer customer = await _customerRepository.GetByIdAsync(id);
 		if (customer is not null)
 		{
-			return _mapper.Map<CarDto>(customer);
+			return _mapper.Map<CustomerDto>(customer);
 		}
 		return null;
 	}
@@ -48,8 +47,4 @@ public class CustomerService : ICustomerService
 		return _mapper.Map<CustomerDto>(await _customerRepository.DeleteAsync(id));
 	}
 
-	Task<CustomerDto> ICustomerService.GetCustomerByIdAsync(object id)
-	{
-		throw new NotImplementedException();
-	}
 }

@@ -1,6 +1,6 @@
 ﻿namespace CarRental.Api.Dtos;
 
-public class RoleDto
+public record RoleDto
 {
 	public string Name { get; set; }
 

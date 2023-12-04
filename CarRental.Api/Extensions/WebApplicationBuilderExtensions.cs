@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-
-namespace CarRental.Api.Extensions;
+﻿namespace CarRental.Api.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {

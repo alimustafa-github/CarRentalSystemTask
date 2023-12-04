@@ -1,9 +1,4 @@
-﻿using CarRental.Api.Dtos.CarDtos;
-using CarRental.Api.Services.IService;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-
-namespace CarRental.Api.Controllers;
+﻿namespace CarRental.Api.Controllers;
 [Route("api/car")]
 [ApiController]
 [Authorize]
@@ -53,8 +48,6 @@ public class CarController : ControllerBase
 		}
 	}
 
-
-
 	[HttpGet("searchcarbyid/{id}")]
 	public async Task<ApiResponse<CarDto>> GetCarById(Guid id)
 	{
@@ -90,10 +83,6 @@ public class CarController : ControllerBase
 			};
 		}
 	}
-
-
-
-
 
 	[HttpPost("addcar")]
 	public async Task<ApiResponse<CarDto>> AddCar([FromBody] AddCarDto addCarDto)
@@ -135,7 +124,7 @@ public class CarController : ControllerBase
 
 
 	[HttpPut("updatecar/{id}")]
-	public async Task<ApiResponse<CarDto>> updateCar(object id, [FromBody] UpdateCarDto updateCarDto)
+	public async Task<ApiResponse<CarDto>> UpdateCar(object id, [FromBody] UpdateCarDto updateCarDto)
 	{
 
 		try
@@ -302,6 +291,45 @@ public class CarController : ControllerBase
 		}
 	}
 
+
+
+
+	[HttpGet("filtercarsbyserialnumber/{number}")]
+	public async Task<ApiResponse<IEnumerable<CarDto>>> FilterTheCars(string number)
+	{
+		try
+		{
+			IEnumerable<CarDto> carDtos = await _carService.FilterTheCarsBySerialNumber(number);
+
+			if (carDtos is not null)
+			{
+				return new ApiResponse<IEnumerable<CarDto>>
+				{
+					IsSuccess = true,
+					Data = carDtos,
+					Message = string.Empty
+				};
+			}
+			else
+			{
+				return new ApiResponse<IEnumerable<CarDto>>
+				{
+					IsSuccess = false,
+					Data = null,
+					Message = "Could not find the car"
+				};
+			}
+		}
+		catch (Exception ex)
+		{
+			return new ApiResponse<IEnumerable<CarDto>>
+			{
+				IsSuccess = false,
+				Data = null,
+				Message = ex.Message
+			};
+		}
+	}
 
 
 }

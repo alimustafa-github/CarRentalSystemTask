@@ -1,6 +1,4 @@
-﻿using CarRental.Core.Entities;
-
-namespace CarRental.Api.Dtos.MembershipDtos;
+﻿namespace CarRental.Api.Dtos.MembershipDtos;
 
 public record UpdateMembershipDto
 {

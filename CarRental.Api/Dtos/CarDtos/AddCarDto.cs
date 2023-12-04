@@ -1,6 +1,4 @@
-﻿using CarRental.Core;
-
-namespace CarRental.Api.Dtos.CarDtos;
+﻿namespace CarRental.Api.Dtos.CarDtos;
 public record AddCarDto
 {
 	public int SerialNumber { get; set; }
@@ -12,4 +10,6 @@ public record AddCarDto
 	public decimal EngineCapacity { get; set; }
 
     public bool IsRented { get; set; }
+
+    public DriverDto Driver { get; set; }
 }

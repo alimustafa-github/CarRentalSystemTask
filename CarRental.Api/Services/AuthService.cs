@@ -1,16 +1,4 @@
-﻿using AutoMapper;
-using CarRental.Api.Dtos;
-using CarRental.Api.Dtos.UserDtos;
-using CarRental.Api.Services.IService;
-using CarRental.Core;
-using CarRental.Core.Entities;
-using CarRental.Infrastructure.Data;
-using CarRental.Infrastructure.Data.EntitiesRepositories;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Data;
-
-namespace CarRental.Api.Services;
+﻿namespace CarRental.Api.Services;
 
 public class AuthService : IAuthService
 {

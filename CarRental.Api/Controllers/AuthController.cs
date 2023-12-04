@@ -1,12 +1,4 @@
-﻿using CarRental.Api.Dtos;
-using CarRental.Api.Dtos.UserDtos;
-using CarRental.Api.Services.IService;
-using CarRental.Core;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-
-namespace CarRental.Api.Controllers;
+﻿namespace CarRental.Api.Controllers;
 [Route("api/authentication")]
 [ApiController]
 public class AuthController : ControllerBase

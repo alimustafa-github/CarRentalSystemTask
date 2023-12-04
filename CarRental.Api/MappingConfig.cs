@@ -1,11 +1,4 @@
-﻿using AutoMapper;
-using CarRental.Api.Dtos;
-using CarRental.Api.Dtos.CarDtos;
-using CarRental.Api.Dtos.UserDtos;
-using CarRental.Core.Entities;
-using Microsoft.AspNetCore.Identity;
-
-namespace CarRental.Api;
+﻿namespace CarRental.Api;
 
 public class MappingConfig
 {
@@ -14,6 +7,7 @@ public class MappingConfig
 		var mappingConfig = new MapperConfiguration(config =>
 		{
 			config.CreateMap<Car, AddCarDto>().ReverseMap();
+			config.CreateMap<Car, CarDto>().ReverseMap();
 			config.CreateMap<ApplicationUser,RegistrationRequestDto>().ReverseMap();
 			config.CreateMap<RoleDto, IdentityRole>().ReverseMap();
 		});

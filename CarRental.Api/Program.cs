@@ -1,18 +1,3 @@
-using AutoMapper;
-using CarRental.Api;
-using CarRental.Api.Extensions;
-using CarRental.Api.Services;
-using CarRental.Api.Services.IService;
-using CarRental.Core.Entities;
-using CarRental.Infrastructure.Data;
-using CarRental.Infrastructure.Data.EntitiesRepositories;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
