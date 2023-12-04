@@ -1,7 +1,4 @@
-﻿using CarRental.Api.Dtos;
-using CarRental.Core.Entities;
-
-namespace CarRental.Api.Services.IService;
+﻿namespace CarRental.Api.Services.IService;
 
 public interface IAuthService
 {

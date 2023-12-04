@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CarRental.Api.Dtos;
+using CarRental.Api.Dtos.UserDtos;
 using CarRental.Api.Services.IService;
 using CarRental.Core;
 using CarRental.Core.Entities;

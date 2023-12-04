@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace CarRental.Infrastructure.Migrations
+namespace CarRental.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -34,6 +34,8 @@ namespace CarRental.Infrastructure.Migrations
                     LastName = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CurrentAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsCustomer = table.Column<bool>(type: "bit", nullable: false),
+                    IsDriver = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -59,7 +61,7 @@ namespace CarRental.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    Title = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false)
+                    Title = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -191,12 +193,13 @@ namespace CarRental.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     TotalRentalCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
-                    JoinDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2023, 12, 3, 15, 57, 42, 813, DateTimeKind.Local).AddTicks(9436)),
-                    ContractEndDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 6, 3, 15, 57, 42, 813, DateTimeKind.Local).AddTicks(9952)),
+                    JoinDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2023, 12, 4, 13, 28, 12, 885, DateTimeKind.Local).AddTicks(1432)),
+                    ContractEndDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 6, 4, 13, 28, 12, 885, DateTimeKind.Local).AddTicks(1984)),
                     LicenceNumber = table.Column<string>(type: "varchar(12)", unicode: false, maxLength: 12, nullable: false),
                     LicenseExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ContractNumber = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsBusy = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
+                    IsAvailable = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    AlternativeDriverId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -207,26 +210,10 @@ namespace CarRental.Infrastructure.Migrations
                         principalTable: "ApplicationUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Cars",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    SerialNumber = table.Column<int>(type: "int", maxLength: 50, nullable: false),
-                    CarTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DailyFaire = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Color = table.Column<int>(type: "int", nullable: false),
-                    EngineCapacity = table.Column<decimal>(type: "decimal(18,2)", maxLength: 10, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Cars", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Cars_CarTypes_CarTypeId",
-                        column: x => x.CarTypeId,
-                        principalTable: "CarTypes",
+                        name: "FK_Drivers_Drivers_AlternativeDriverId",
+                        column: x => x.AlternativeDriverId,
+                        principalTable: "Drivers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -263,13 +250,45 @@ namespace CarRental.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Cars",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
+                    SerialNumber = table.Column<int>(type: "int", maxLength: 15, nullable: false),
+                    CarTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DailyFaire = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Color = table.Column<int>(type: "int", nullable: false),
+                    EngineCapacity = table.Column<decimal>(type: "decimal(18,2)", maxLength: 10, nullable: false),
+                    IsRented = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    DriverId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cars", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Cars_CarTypes_CarTypeId",
+                        column: x => x.CarTypeId,
+                        principalTable: "CarTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Cars_Drivers_DriverId",
+                        column: x => x.DriverId,
+                        principalTable: "Drivers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RentedCars",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     DriverId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ReservationStartDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2023, 12, 4, 13, 28, 12, 886, DateTimeKind.Local).AddTicks(2029)),
+                    ReservationEndDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 6, 4, 13, 28, 12, 886, DateTimeKind.Local).AddTicks(2680))
                 },
                 constraints: table =>
                 {
@@ -338,9 +357,21 @@ namespace CarRental.Infrastructure.Migrations
                 column: "CarTypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Cars_DriverId",
+                table: "Cars",
+                column: "DriverId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Cars_SerialNumber",
                 table: "Cars",
                 column: "SerialNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CarTypes_Title",
+                table: "CarTypes",
+                column: "Title",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -361,6 +392,12 @@ namespace CarRental.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Drivers_AlternativeDriverId",
+                table: "Drivers",
+                column: "AlternativeDriverId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Drivers_ContractNumber",
                 table: "Drivers",
                 column: "ContractNumber",
@@ -376,6 +413,12 @@ namespace CarRental.Infrastructure.Migrations
                 name: "IX_Drivers_UserId",
                 table: "Drivers",
                 column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Memberships_Level",
+                table: "Memberships",
+                column: "Level",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -428,10 +471,10 @@ namespace CarRental.Infrastructure.Migrations
                 name: "Customers");
 
             migrationBuilder.DropTable(
-                name: "Drivers");
+                name: "CarTypes");
 
             migrationBuilder.DropTable(
-                name: "CarTypes");
+                name: "Drivers");
 
             migrationBuilder.DropTable(
                 name: "Memberships");

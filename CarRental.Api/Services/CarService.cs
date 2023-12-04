@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using CarRental.Api.Dtos;
+using CarRental.Api.Dtos.CarDtos;
 using CarRental.Api.Services.IService;
 using CarRental.Core.Entities;
 using CarRental.Infrastructure.Data.EntitiesRepositories;
@@ -34,13 +34,13 @@ public class CarService : ICarService
 		return null;
 	}
 
-	public async Task<CarDto> AddCarAsync(CarDto carDto)
+	public async Task<CarDto> AddCarAsync(AddCarDto addCarDto)
 	{
-		if (carDto is not null)
+		if (addCarDto is not null)
 		{
-			Car car = _mapper.Map<Car>(carDto);
+			Car car = _mapper.Map<Car>(addCarDto);
 			car = await _carRepository.AddAsync(car);
-			carDto = _mapper.Map<CarDto>(car);
+			CarDto carDto = _mapper.Map<CarDto>(car);
 			return carDto;
 		}
 		else
@@ -49,11 +49,12 @@ public class CarService : ICarService
 		}
 	}
 
-	public async Task<CarDto> UpdateCarAsync(CarDto carDto)
+	public async Task<CarDto> UpdateCarAsync(object carId, UpdateCarDto updateCarDto)
 	{
-		if (carDto is not null)
+		if (updateCarDto is not null && carId is not null)
 		{
-			Car car = _mapper.Map<Car>(carDto);
+			Car car = await _carRepository.GetByIdAsync(carId);
+		    car = _mapper.Map<Car>(updateCarDto);
 			await _carRepository.UpdateAsync(car);
 			return _mapper.Map<CarDto>(car);
 		}

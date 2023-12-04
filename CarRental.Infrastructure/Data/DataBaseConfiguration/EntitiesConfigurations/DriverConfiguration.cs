@@ -42,7 +42,13 @@ public class DriverConfiguration : IEntityTypeConfiguration<Driver>
 		builder.Property(d => d.ContractNumber).IsRequired();
 		builder.HasIndex(d => d.ContractNumber).IsUnique();
 
-		builder.Property(d => d.IsBusy).IsRequired().HasDefaultValue(false);
+		builder.Property(d => d.IsAvailable).IsRequired().HasDefaultValue(true);
 
+		builder.HasOne(d => d.AlternativeDriver)
+			   .WithOne()
+			   .HasForeignKey<Driver>(d => d.AlternativeDriverId)
+			   .OnDelete(DeleteBehavior.Restrict);
+		builder.Property(d => d.AlternativeDriverId).IsRequired();
+		builder.HasIndex(d => d.AlternativeDriverId).IsUnique();
 	}
 }

@@ -1,4 +1,6 @@
-﻿namespace CarRental.Api.Dtos;
+﻿using CarRental.Api.Dtos.CarDtos;
+
+namespace CarRental.Api.Dtos;
 
 public class RentedCarDto
 {
@@ -8,5 +10,5 @@ public class RentedCarDto
 	public DriverDto? Driver { get; set; }
 
 	public Guid CarId { get; set; }
-	public CarDto Car { get; set; }
+	public AddCarDto Car { get; set; }
 }

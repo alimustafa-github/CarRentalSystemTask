@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace CarRental.Infrastructure.Migrations
+namespace CarRental.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -52,6 +52,12 @@ namespace CarRental.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
+
+                    b.Property<bool>("IsCustomer")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDriver")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -120,17 +126,28 @@ namespace CarRental.Infrastructure.Migrations
                     b.Property<decimal>("DailyFaire")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid>("DriverId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<decimal>("EngineCapacity")
                         .HasMaxLength(10)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<bool>("IsRented")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<int>("SerialNumber")
-                        .HasMaxLength(50)
+                        .HasMaxLength(15)
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CarTypeId");
+
+                    b.HasIndex("DriverId")
+                        .IsUnique();
 
                     b.HasIndex("SerialNumber")
                         .IsUnique();
@@ -148,10 +165,12 @@ namespace CarRental.Infrastructure.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Title")
+                        .IsUnique();
 
                     b.ToTable("CarTypes");
                 });
@@ -213,23 +232,26 @@ namespace CarRental.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
 
+                    b.Property<Guid>("AlternativeDriverId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("ContractEndDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 3, 15, 57, 42, 813, DateTimeKind.Local).AddTicks(9952));
+                        .HasDefaultValue(new DateTime(2024, 6, 4, 13, 28, 12, 885, DateTimeKind.Local).AddTicks(1984));
 
                     b.Property<Guid>("ContractNumber")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsBusy")
+                    b.Property<bool>("IsAvailable")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasDefaultValue(true);
 
                     b.Property<DateTime>("JoinDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2023, 12, 3, 15, 57, 42, 813, DateTimeKind.Local).AddTicks(9436));
+                        .HasDefaultValue(new DateTime(2023, 12, 4, 13, 28, 12, 885, DateTimeKind.Local).AddTicks(1432));
 
                     b.Property<string>("LicenceNumber")
                         .IsRequired()
@@ -250,6 +272,9 @@ namespace CarRental.Infrastructure.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AlternativeDriverId")
+                        .IsUnique();
 
                     b.HasIndex("ContractNumber")
                         .IsUnique();
@@ -278,6 +303,9 @@ namespace CarRental.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Level")
+                        .IsUnique();
+
                     b.ToTable("Memberships");
                 });
 
@@ -296,6 +324,16 @@ namespace CarRental.Infrastructure.Migrations
 
                     b.Property<Guid?>("DriverId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ReservationEndDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 6, 4, 13, 28, 12, 886, DateTimeKind.Local).AddTicks(2680));
+
+                    b.Property<DateTime>("ReservationStartDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2023, 12, 4, 13, 28, 12, 886, DateTimeKind.Local).AddTicks(2029));
 
                     b.HasKey("Id");
 
@@ -450,10 +488,18 @@ namespace CarRental.Infrastructure.Migrations
                     b.HasOne("CarRental.Core.Entities.CarType", "CarType")
                         .WithMany("Cars")
                         .HasForeignKey("CarTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CarRental.Core.Entities.Driver", "Driver")
+                        .WithOne("Car")
+                        .HasForeignKey("CarRental.Core.Entities.Car", "DriverId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CarType");
+
+                    b.Navigation("Driver");
                 });
 
             modelBuilder.Entity("CarRental.Core.Entities.Customer", b =>
@@ -477,11 +523,19 @@ namespace CarRental.Infrastructure.Migrations
 
             modelBuilder.Entity("CarRental.Core.Entities.Driver", b =>
                 {
+                    b.HasOne("CarRental.Core.Entities.Driver", "AlternativeDriver")
+                        .WithOne()
+                        .HasForeignKey("CarRental.Core.Entities.Driver", "AlternativeDriverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("CarRental.Core.Entities.ApplicationUser", "User")
                         .WithOne("Driver")
                         .HasForeignKey("CarRental.Core.Entities.Driver", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AlternativeDriver");
 
                     b.Navigation("User");
                 });
@@ -579,6 +633,12 @@ namespace CarRental.Infrastructure.Migrations
             modelBuilder.Entity("CarRental.Core.Entities.Customer", b =>
                 {
                     b.Navigation("RentedCars");
+                });
+
+            modelBuilder.Entity("CarRental.Core.Entities.Driver", b =>
+                {
+                    b.Navigation("Car")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("CarRental.Core.Entities.Membership", b =>
