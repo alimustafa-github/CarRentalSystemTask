@@ -1,11 +1,4 @@
-﻿using AutoMapper;
-using CarRental.Api.Dtos;
-using CarRental.Api.Services.IService;
-using CarRental.Core.Entities;
-using CarRental.Infrastructure.Data.EntitiesRepositories;
-using Microsoft.EntityFrameworkCore;
-
-namespace CarRental.Api.Services;
+﻿namespace CarRental.Api.Services;
 
 public class CarService : ICarService
 {
@@ -20,7 +13,7 @@ public class CarService : ICarService
 
 	public async Task<IEnumerable<CarDto>> GetCarsAsync(int pageNumber, int pageSize)
 	{
-		IQueryable<Car> cars = _carRepository.GetFromCacheAsync(pageNumber,pageSize).Result.AsQueryable();
+		IQueryable<Car> cars = _carRepository.GetFromCacheAsync(pageNumber, pageSize).Result.AsQueryable();
 		return _mapper.Map<IEnumerable<CarDto>>(cars);
 	}
 
@@ -34,13 +27,13 @@ public class CarService : ICarService
 		return null;
 	}
 
-	public async Task<CarDto> AddCarAsync(CarDto carDto)
+	public async Task<CarDto> AddCarAsync(AddCarDto addCarDto)
 	{
-		if (carDto is not null)
+		if (addCarDto is not null)
 		{
-			Car car = _mapper.Map<Car>(carDto);
+			Car car = _mapper.Map<Car>(addCarDto);
 			car = await _carRepository.AddAsync(car);
-			carDto = _mapper.Map<CarDto>(car);
+			CarDto carDto = _mapper.Map<CarDto>(car);
 			return carDto;
 		}
 		else
@@ -49,11 +42,12 @@ public class CarService : ICarService
 		}
 	}
 
-	public async Task<CarDto> UpdateCarAsync(CarDto carDto)
+	public async Task<CarDto> UpdateCarAsync(object carId, UpdateCarDto updateCarDto)
 	{
-		if (carDto is not null)
+		if (updateCarDto is not null && carId is not null)
 		{
-			Car car = _mapper.Map<Car>(carDto);
+			Car car = await _carRepository.GetByIdAsync(carId);
+			car = _mapper.Map<Car>(updateCarDto);
 			await _carRepository.UpdateAsync(car);
 			return _mapper.Map<CarDto>(car);
 		}
@@ -82,5 +76,11 @@ public class CarService : ICarService
 		return _mapper.Map<IEnumerable<CarDto>>(await _carRepository.SortAsync(car => car.SerialNumber, pageNumber, pageSize));
 	}
 
-
+	public async Task<IEnumerable<CarDto>> FilterTheCarsBySerialNumber( string value)
+	{
+		//todo : handle the errors if any 
+		string propertyName = "SerialNumber";
+		IEnumerable<CarDto> carDtos = _mapper.Map<IEnumerable<CarDto>>(await _carRepository.FilterTheRecords(propertyName, value));
+		return carDtos;
+	}
 }

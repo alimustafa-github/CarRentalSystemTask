@@ -1,18 +1,3 @@
-using AutoMapper;
-using CarRental.Api;
-using CarRental.Api.Extensions;
-using CarRental.Api.Services;
-using CarRental.Api.Services.IService;
-using CarRental.Core.Entities;
-using CarRental.Infrastructure.Data;
-using CarRental.Infrastructure.Data.EntitiesRepositories;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -38,12 +23,13 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 //Register our Custom serivces here
 builder.Services.AddTransient<ICarService, CarService>();
+builder.Services.AddTransient<IDriverService, DriverService>();
 builder.Services.AddScoped<IJwtTokenGenerator,JwtTokenGenerator>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddTransient<EfCoreCarRepository>();
-builder.Services.AddTransient<EfCoreUserRepository>();
+builder.Services.AddTransient<EfCoreDriverRepository>();
 
-//builder.Services.AddTransient(typeof(EfCoreRepository<,>));
+//builder.Services.AddTransient<EfCoreUserRepository>();
 
 
 //Register the serivces for JWT
@@ -82,7 +68,7 @@ builder.Services.AddAuthorization();
 //Configure the program to work with sql database
 string connectionString = builder.Configuration.GetConnectionString("MyConnection");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString).LogTo(Console.WriteLine, LogLevel.Information));
 
 
 

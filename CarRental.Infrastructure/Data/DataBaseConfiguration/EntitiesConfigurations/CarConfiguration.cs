@@ -1,30 +1,36 @@
-﻿using CarRental.Core.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-namespace CarRental.Infrastructure.Data.DataBaseConfiguration.EntitiesConfigurations;
+﻿namespace CarRental.Infrastructure.Data.DataBaseConfiguration.EntitiesConfigurations;
 /// <summary>
 /// This Class will Configure all the columns needed in the Cars Table
 /// </summary>
 public class CarConfiguration : IEntityTypeConfiguration<Car>
 {
-    public void Configure(EntityTypeBuilder<Car> builder)
-    {
-        builder.HasKey(c => c.Id);
+	public void Configure(EntityTypeBuilder<Car> builder)
+	{
+		builder.HasKey(c => c.Id);
+		builder.Property(c => c.Id).ValueGeneratedOnAdd().HasDefaultValueSql("NEWID()");
 
-        builder.Property(c => c.Id).ValueGeneratedOnAdd().HasDefaultValueSql("NEWID()");
+		builder.Property(c => c.SerialNumber)
+		.IsRequired()
+		.HasMaxLength(15);
+		builder.HasIndex(c => c.SerialNumber)
+			.IsUnique();
 
-        builder.Property(c => c.SerialNumber)
-        .IsRequired()
-        .HasMaxLength(50);
+		builder.HasOne(c => c.CarType)
+			.WithMany(m => m.Cars)
+			.HasForeignKey(d => d.CarTypeId)
+			.OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(c => c.SerialNumber)
-            .IsUnique();
+		builder.Property(c => c.DailyFaire).IsRequired();
 
+		builder.Property(c => c.EngineCapacity).IsRequired().HasMaxLength(10);
 
-        builder.Property(c => c.EngineCapacity).IsRequired().HasMaxLength(25);
+		builder.Property(c => c.IsRented).IsRequired().HasDefaultValue(false);
 
-        builder.Property(c => c.WithDriver).HasDefaultValue(false).IsRequired();
-
-    }
+		builder.HasOne(c => c.Driver)
+			   .WithOne(d => d.Car)
+			   .HasForeignKey<Car>(c => c.DriverId)
+			   .OnDelete(DeleteBehavior.Restrict);
+		builder.Property(c => c.DriverId).IsRequired();
+		builder.HasIndex(c => c.DriverId).IsUnique();
+	}
 }

@@ -1,7 +1,4 @@
-﻿using CarRental.Api.Dtos;
-using CarRental.Core.Entities;
-
-namespace CarRental.Api.Services.IService;
+﻿namespace CarRental.Api.Services.IService;
 
 public interface IAuthService
 {
@@ -9,6 +6,5 @@ public interface IAuthService
 	Task<string> RegisterAsync(RegistrationRequestDto registrationRequestDto);
 	Task<bool> AssignRoleAsync(string email, string roleName);
 
-	Task<bool> RemoveRoleAsync(string email, string roleName);
-
+	//todo : The IAuthService is not responsible for add or working with Role , remove them!
 }

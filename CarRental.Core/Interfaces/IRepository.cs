@@ -1,6 +1,4 @@
-﻿using CarRental.Core.Entities;
-
-namespace CarRental.Core.Interfaces;
+﻿namespace CarRental.Core.Interfaces;
 public interface IRepository<T> where T : class
 {
 	Task<T> GetByIdAsync(object id);
@@ -13,20 +11,17 @@ public interface IRepository<T> where T : class
 	Task<IEnumerable<T>> SortAsync(Func<T, IComparable> propertySelector , int pageNumber , int pageSize);
 
 
-
-	//todo : Come Back here
-	///// <summary>
-	///// this method will get data from database based on the propertyName and the prefix which that property starts with
-	///// </summary>
-	///// <param name="propertyName"></param>
-	///// <param name="propertyValuePrefix"></param>
-	///// <returns></returns>
-	//Task<IEnumerable<T>> GetItemsByPropertyPrefix(string propertyName, int propertyValuePrefix);
-
-
+	/// <summary>
+	/// this method will search for records in a table based uppon the propertyName which is the a given field for that table
+	/// and the value entered by the user 
+	/// it looks just like this in Sql : "Select * from 'table' where 'column' like '%value%' "
+	/// </summary>
+	/// <param name="propertyName"></param>
+	/// <param name="value"></param>
+	/// <returns></returns>
+	Task<IEnumerable<T>> FilterTheRecords(string value, string propertyName);
 
 
-	//todo : Come Back here
 	/// <summary>
 	/// this method search for a record in the database according to propert Name 
 	/// </summary>

@@ -1,31 +1,17 @@
-﻿using AutoMapper;
-using CarRental.Api.Dtos;
-using CarRental.Api.Services.IService;
-using CarRental.Core;
-using CarRental.Core.Entities;
-using CarRental.Infrastructure.Data;
-using CarRental.Infrastructure.Data.EntitiesRepositories;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Data;
-
-namespace CarRental.Api.Services;
+﻿namespace CarRental.Api.Services;
 
 public class AuthService : IAuthService
 {
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly RoleManager<IdentityRole> _roleManager;
 	private readonly IJwtTokenGenerator _jwtTokenGenerator;
-	private readonly EfCoreUserRepository _userRepository;
 	private readonly IMapper _mapper;
 
-
-	public AuthService(EfCoreUserRepository userRepository, IMapper mapper, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IJwtTokenGenerator jwtTokenGenerator)
+	public AuthService(IMapper mapper, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IJwtTokenGenerator jwtTokenGenerator)
 	{
 		_userManager = userManager;
 		_roleManager = roleManager;
 		_jwtTokenGenerator = jwtTokenGenerator;
-		_userRepository = userRepository;
 		_mapper = mapper;
 	}
 
@@ -53,7 +39,7 @@ public class AuthService : IAuthService
 		{
 			var result = await _userManager.CreateAsync(user, registrationRequestDto.Password);
 
-			if (result.Succeeded && await AssignRoleAsync(user.Email, AppRoles.User.ToString()))
+			if (result.Succeeded && await AssignRoleAsync(user.Email, AppRoles.Visitor.ToString()))
 			{
 				return string.Empty;
 			}
@@ -85,56 +71,4 @@ public class AuthService : IAuthService
 		}
 		return false;
 	}
-
-
-	public async Task<bool> AddRoleAsync(string roleName)
-	{
-		try
-		{
-			// Check if the role already exists
-			if (!await _roleManager.RoleExistsAsync(roleName))
-			{
-				var result = await _roleManager.CreateAsync(new IdentityRole(roleName));
-
-				return result.Succeeded;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		catch (ArgumentNullException ex)
-		{
-			//todo : log this error
-			return false;
-		}
-
-	}
-
-
-
-
-	public async Task<bool> RemoveRoleAsync(string email, string roleName)
-	{
-		var user = await _userManager.FindByEmailAsync(email);
-
-		if (user is not null && await _roleManager.RoleExistsAsync(roleName))
-		{
-			var result = await _userManager.RemoveFromRoleAsync(user, roleName);
-
-			if (result.Succeeded)
-			{
-				return true;
-			}
-			else
-			{
-				//todo : Log the errors as needed
-				return false;
-			}
-		}
-
-		// User not found or role does not exist
-		return false;
-	}
-
 }

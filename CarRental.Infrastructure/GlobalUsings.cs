@@ -1,0 +1,12 @@
+﻿global using CarRental.Core.Entities;
+global using Microsoft.Extensions.Caching.Memory;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.EntityFrameworkCore.Migrations;
+global using Microsoft.EntityFrameworkCore.Infrastructure;
+global using CarRental.Infrastructure.Data.DataBaseConfiguration.EntitiesConfigurations;
+global using CarRental.Infrastructure.Data.DataBaseConfiguration.IdentityConfigurations;
+global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+global using CarRental.Core.Interfaces;
+global using System.Linq.Expressions;

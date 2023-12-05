@@ -1,9 +1,4 @@
-﻿using CarRental.Api.Dtos;
-using CarRental.Api.Services.IService;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-
-namespace CarRental.Api.Controllers;
+﻿namespace CarRental.Api.Controllers;
 [Route("api/car")]
 [ApiController]
 [Authorize]
@@ -17,11 +12,11 @@ public class CarController : ControllerBase
 	}
 
 	[HttpGet("getcars/{pagenumber}/{pagesize}")]
-	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCars(int pagenumber, int pagesize=15)
+	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCars(int pagenumber, int pagesize = 15)
 	{
 		try
 		{
-			IEnumerable<CarDto> carDtos = await _carService.GetCarsAsync(pagenumber, pagesize);	
+			IEnumerable<CarDto> carDtos = await _carService.GetCarsAsync(pagenumber, pagesize);
 
 			if (carDtos != null)
 			{
@@ -52,8 +47,6 @@ public class CarController : ControllerBase
 			};
 		}
 	}
-
-
 
 	[HttpGet("searchcarbyid/{id}")]
 	public async Task<ApiResponse<CarDto>> GetCarById(Guid id)
@@ -91,19 +84,15 @@ public class CarController : ControllerBase
 		}
 	}
 
-
-
-
-
 	[HttpPost("addcar")]
-	public async Task<ApiResponse<CarDto>> AddCar([FromBody] CarDto carDto)
+	public async Task<ApiResponse<CarDto>> AddCar([FromBody] AddCarDto addCarDto)
 	{
 
 		try
 		{
-			if (carDto != null)
+			if (addCarDto != null)
 			{
-				carDto = await _carService.AddCarAsync(carDto);
+				CarDto carDto = await _carService.AddCarAsync(addCarDto);
 				return new ApiResponse<CarDto>
 				{
 					IsSuccess = true,
@@ -134,15 +123,15 @@ public class CarController : ControllerBase
 
 
 
-	[HttpPut("updatecar")]
-	public async Task<ApiResponse<CarDto>> updateCar([FromBody] CarDto carDto)
+	[HttpPut("updatecar/{id}")]
+	public async Task<ApiResponse<CarDto>> UpdateCar(Guid id, [FromBody] UpdateCarDto updateCarDto)
 	{
 
 		try
 		{
-			if (carDto != null)
+			if (updateCarDto is not null && !string.IsNullOrWhiteSpace(id.ToString()))
 			{
-				carDto = await _carService.UpdateCarAsync(carDto);
+				CarDto carDto = await _carService.UpdateCarAsync(id, updateCarDto);
 				return new ApiResponse<CarDto>
 				{
 					IsSuccess = true,
@@ -173,7 +162,7 @@ public class CarController : ControllerBase
 
 
 	[HttpDelete("deletecarbyid/{id}")]
-	public async Task<ApiResponse<CarDto>> DeleteCar(Guid id)
+	public async Task<ApiResponse<CarDto>> DeleteCar(object id)
 	{
 
 		try
@@ -214,7 +203,7 @@ public class CarController : ControllerBase
 		catch (Exception ex)
 		{
 			return new ApiResponse<CarDto>
-			{ 
+			{
 				IsSuccess = false,
 				Data = null,
 				Message = ex.Message
@@ -229,7 +218,7 @@ public class CarController : ControllerBase
 	{
 		try
 		{
-			IEnumerable<CarDto> carDtos = await _carService.SortCarsBySerialNumber(pagenumber, pagesize);	
+			IEnumerable<CarDto> carDtos = await _carService.SortCarsBySerialNumber(pagenumber, pagesize);
 			if (carDtos != null)
 			{
 
@@ -302,6 +291,45 @@ public class CarController : ControllerBase
 		}
 	}
 
+
+
+
+	[HttpGet("filtercarsbyserialnumber/{number}")]
+	public async Task<ApiResponse<IEnumerable<CarDto>>> FilterTheCars(string number)
+	{
+		try
+		{
+			IEnumerable<CarDto> carDtos = await _carService.FilterTheCarsBySerialNumber(number);
+
+			if (carDtos is not null)
+			{
+				return new ApiResponse<IEnumerable<CarDto>>
+				{
+					IsSuccess = true,
+					Data = carDtos,
+					Message = string.Empty
+				};
+			}
+			else
+			{
+				return new ApiResponse<IEnumerable<CarDto>>
+				{
+					IsSuccess = false,
+					Data = null,
+					Message = "Could not find the car"
+				};
+			}
+		}
+		catch (Exception ex)
+		{
+			return new ApiResponse<IEnumerable<CarDto>>
+			{
+				IsSuccess = false,
+				Data = null,
+				Message = ex.Message
+			};
+		}
+	}
 
 
 }

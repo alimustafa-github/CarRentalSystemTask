@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-namespace CarRental.Infrastructure.Data.DataBaseConfiguration.IdentityConfigurations;
+﻿namespace CarRental.Infrastructure.Data.DataBaseConfiguration.IdentityConfigurations;
 
 public class ApplicationUserClaimConfiguration : IEntityTypeConfiguration<IdentityUserClaim<string>>
 {

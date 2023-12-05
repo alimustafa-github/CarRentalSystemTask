@@ -1,10 +1,4 @@
-﻿using CarRental.Core.Entities;
-using CarRental.Core.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using System.Linq.Expressions;
-
-namespace CarRental.Infrastructure.Data;
+﻿namespace CarRental.Infrastructure.Data;
 public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 	where TEntity : class
 	where TContext : DbContext
@@ -95,5 +89,39 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 		var entity = await _context.Set<TEntity>().FirstOrDefaultAsync(lambda);
 
 		return (TEntity?)entity;
+	}
+
+
+	/// <summary>
+	/// this method will search for records in a table based uppon the propertyName which is the a given field for that table
+	/// and the value entered by the user 
+	/// it looks just like this in Sql : "Select * from 'table' where 'column' like '%value%' "
+	/// </summary>
+	/// <param name="propertyName"></param>
+	/// <param name="value"></param>
+	/// <returns></returns>
+	public async Task<IEnumerable<TEntity>> FilterTheRecords(string value, string propertyName)
+	{
+		// Get the property info for the specified property name
+		var propertyInfo = typeof(TEntity).GetProperty(propertyName);
+
+		// Create a parameter expression for the entity type
+		var parameter = Expression.Parameter(typeof(TEntity));
+
+		// Create an expression representing accessing the specified property
+		var propertyAccess = Expression.Property(parameter, propertyInfo);
+
+		// Create an expression representing the equality check with the provided keyword
+		var equals = Expression.Equal(propertyAccess, Expression.Constant(value));
+
+		// Combine the property access and equality check into a lambda expression
+		var lambda = Expression.Lambda<Func<TEntity, bool>>(equals, parameter);
+
+		// Use the lambda expression in a Where clause to filter the entities
+		//var filteredEntities =await _context.Set<TEntity>().ToListAsync().Where(lambda);
+
+		var filteredEntities = _context.Set<TEntity>().Where(lambda);
+
+		return filteredEntities;
 	}
 }
