@@ -7,7 +7,6 @@ public class AuthService : IAuthService
 	private readonly IJwtTokenGenerator _jwtTokenGenerator;
 	private readonly IMapper _mapper;
 
-
 	public AuthService(IMapper mapper, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IJwtTokenGenerator jwtTokenGenerator)
 	{
 		_userManager = userManager;

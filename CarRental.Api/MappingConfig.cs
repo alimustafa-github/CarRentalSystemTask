@@ -8,8 +8,15 @@ public class MappingConfig
 		{
 			config.CreateMap<Car, AddCarDto>().ReverseMap();
 			config.CreateMap<Car, CarDto>().ReverseMap();
-			config.CreateMap<ApplicationUser,RegistrationRequestDto>().ReverseMap();
+			config.CreateMap<ApplicationUser, RegistrationRequestDto>().ReverseMap();
+			config.CreateMap<ApplicationUser,ApplicationUserDto>().ReverseMap();
 			config.CreateMap<RoleDto, IdentityRole>().ReverseMap();
+
+			config.CreateMap<AlternativeDriverDto, Driver>().ReverseMap();
+			config.CreateMap<AddDriverDto, Driver>().ReverseMap();
+			config.CreateMap<DriverDto, Driver>().ReverseMap();
+
+
 		});
 
 		return mappingConfig;

@@ -11,5 +11,4 @@ public record DriverDto
 	public DateTime LicenseExpirationDate { get; set; }
 	public bool IsAvailable { get; set; }
 	public AlternativeDriverDto AlternativeDriver { get; set; }
-	public CarDto Car { get; set; }
 }

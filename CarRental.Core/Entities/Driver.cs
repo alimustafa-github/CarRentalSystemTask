@@ -11,7 +11,7 @@ public class Driver : IEntityBase
 	public DateTime LicenseExpirationDate { get; set; }
 	public Guid ContractNumber { get; set; }
 	public bool IsAvailable { get; set; }
-	public Driver AlternativeDriver { get; set; }
-	public Guid AlternativeDriverId { get; set; }
+	public Driver? AlternativeDriver { get; set; }
+	public Guid? AlternativeDriverId { get; set; }
 	public Car Car { get; set; }
 }

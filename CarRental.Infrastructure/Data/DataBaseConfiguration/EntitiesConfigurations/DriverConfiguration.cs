@@ -38,7 +38,7 @@ public class DriverConfiguration : IEntityTypeConfiguration<Driver>
 			   .WithOne()
 			   .HasForeignKey<Driver>(d => d.AlternativeDriverId)
 			   .OnDelete(DeleteBehavior.Restrict);
-		builder.Property(d => d.AlternativeDriverId).IsRequired();
+		builder.Property(d => d.AlternativeDriverId).IsRequired(false);
 		builder.HasIndex(d => d.AlternativeDriverId).IsUnique();
 	}
 }

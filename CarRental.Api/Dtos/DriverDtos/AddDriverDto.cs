@@ -1,11 +1,13 @@
 ﻿namespace CarRental.Api.Dtos.DriverDtos;
 
-public record UpdateDriverDto
+public record AddDriverDto
 {
+	public RegistrationRequestDto User { get; set; }
+	public int TotalRentalCount { get; set; }
 	public DateTime JoinDate { get; set; }
 	public DateTime ContractEndDate { get; set; }
 	public string LicenceNumber { get; set; }
 	public DateTime LicenseExpirationDate { get; set; }
-	public AlternativeDriverDto AlternativeDriver { get; set; }
-	public CarDto Car { get; set; }
+	public bool IsAvailable { get; set; }
+	public Guid? AlternativeDriverId { get; set; }
 }
