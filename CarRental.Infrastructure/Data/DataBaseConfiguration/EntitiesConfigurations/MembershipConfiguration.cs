@@ -1,8 +1,4 @@
-﻿using CarRental.Core.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-namespace CarRental.Infrastructure.Data.DataBaseConfiguration.EntitiesConfigurations;
+﻿namespace CarRental.Infrastructure.Data.DataBaseConfiguration.EntitiesConfigurations;
 public class MembershipConfiguration : IEntityTypeConfiguration<Membership>
 {
 	public void Configure(EntityTypeBuilder<Membership> builder)

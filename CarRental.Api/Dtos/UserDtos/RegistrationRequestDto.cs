@@ -1,6 +1,6 @@
 ﻿namespace CarRental.Api.Dtos.UserDtos;
 
-public class RegistrationRequestDto
+public record RegistrationRequestDto
 {
     public string Email { get; set; }
     public string FirstName { get; set; }
@@ -8,4 +8,6 @@ public class RegistrationRequestDto
     public string PhoneNumber { get; set; }
     public string UserName { get; set; }
     public string Password { get; set; }
+	public string CurrentAddress { get; set; }
+
 }

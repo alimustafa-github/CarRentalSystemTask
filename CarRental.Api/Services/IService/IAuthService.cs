@@ -6,10 +6,5 @@ public interface IAuthService
 	Task<string> RegisterAsync(RegistrationRequestDto registrationRequestDto);
 	Task<bool> AssignRoleAsync(string email, string roleName);
 
-	Task<bool> RemoveRoleAsync(string email, string roleName);
-	Task<RoleDto> AddRoleAsync(RoleDto roleDto);
-
-	Task<IEnumerable<RoleDto>> GetRolesAsync();
-
-
+	//todo : The IAuthService is not responsible for add or working with Role , remove them!
 }

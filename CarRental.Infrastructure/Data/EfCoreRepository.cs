@@ -1,10 +1,4 @@
-﻿using CarRental.Core.Entities;
-using CarRental.Core.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using System.Linq.Expressions;
-
-namespace CarRental.Infrastructure.Data;
+﻿namespace CarRental.Infrastructure.Data;
 public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 	where TEntity : class
 	where TContext : DbContext
@@ -118,7 +112,7 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 		var propertyAccess = Expression.Property(parameter, propertyInfo);
 
 		// Create an expression representing the equality check with the provided keyword
-		var equals = Expression.Equal(propertyAccess, Expression.Constant(keyword));
+		var equals = Expression.Equal(propertyAccess, Expression.Constant(value));
 
 		// Combine the property access and equality check into a lambda expression
 		var lambda = Expression.Lambda<Func<TEntity, bool>>(equals, parameter);

@@ -56,7 +56,6 @@ public class AuthController : ControllerBase
 
 
 
-	[Authorize(Roles = nameof(AppRoles.Admin))]
 	[HttpPost("assignrole/{email}/{role}")]
 	public async Task<ApiResponse<bool>> AssignRole(string email, string role)
 	{
@@ -79,57 +78,56 @@ public class AuthController : ControllerBase
 		}
 
 	}
-	[Authorize(Roles = nameof(AppRoles.Admin))]
-	[HttpPost("removerole/{email}/{role}")]
-	public async Task<ApiResponse<bool>> RemoveRole(string email, string role)
-	{
-		bool result = await _authService.RemoveRoleAsync(email, role);
-		if (result)
-		{
-			return new ApiResponse<bool>
-			{
-				IsSuccess = true,
-				Message = "Role Removed Successfully"
-			};
-		}
-		else
-		{
-			return new ApiResponse<bool>
-			{
-				IsSuccess = false,
-				Message = "Could not remove role , Please check that the email or the role name is correct"
-			};
-		}
+	//[Authorize(Roles = nameof(AppRoles.Admin))]
+	//[HttpPost("removerole/{email}/{role}")]
+	//public async Task<ApiResponse<bool>> RemoveRole(string email, string role)
+	//{
+	//	bool result = await _authService.RemoveRoleAsync(email, role);
+	//	if (result)
+	//	{
+	//		return new ApiResponse<bool>
+	//		{
+	//			IsSuccess = true,
+	//			Message = "Role Removed Successfully"
+	//		};
+	//	}
+	//	else
+	//	{
+	//		return new ApiResponse<bool>
+	//		{
+	//			IsSuccess = false,
+	//			Message = "Could not remove role , Please check that the email or the role name is correct"
+	//		};
+	//	}
 
-	}
+	//}
 
 
 
-	[Authorize(Roles = "Admin")]
-	[HttpPost("addrole")]
-	public async Task<ApiResponse<RoleDto>> AddRole([FromBody] RoleDto roleDto)
-	{
-		RoleDto result = await _authService.AddRoleAsync(roleDto);
-		if (result is not null)
-		{
-			return new ApiResponse<RoleDto>
-			{
-				IsSuccess = true,
-				Data = roleDto,
-				Message = "Role Created Successfully"
-			};
-		}
-		else
-		{
-			return new ApiResponse<RoleDto>
-			{
-				IsSuccess = false,
-				Data = null,
-				Message = "Could not Create role "
-			};
-		}
+	//[HttpPost("addrole")]
+	//public async Task<ApiResponse<RoleDto>> AddRole([FromBody] RoleDto roleDto)
+	//{
+	//	RoleDto result = await _authService.AddRoleAsync(roleDto);
+	//	if (result is not null)
+	//	{
+	//		return new ApiResponse<RoleDto>
+	//		{
+	//			IsSuccess = true,
+	//			Data = roleDto,
+	//			Message = "Role Created Successfully"
+	//		};
+	//	}
+	//	else
+	//	{
+	//		return new ApiResponse<RoleDto>
+	//		{
+	//			IsSuccess = false,
+	//			Data = null,
+	//			Message = "Could not Create role "
+	//		};
+	//	}
 
-	}
+	//}
 
 
 

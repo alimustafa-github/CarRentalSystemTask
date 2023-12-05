@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarRental.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231204112813_InitialCreate")]
+    [Migration("20231204174343_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -38,10 +38,9 @@ namespace CarRental.Infrastructure.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CurrentAddress")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("DateOfBirth")
+                    b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
@@ -63,7 +62,6 @@ namespace CarRental.Infrastructure.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
@@ -197,13 +195,14 @@ namespace CarRental.Infrastructure.Data.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<DateTime>("JoinDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2023, 12, 4, 19, 43, 43, 666, DateTimeKind.Local).AddTicks(306));
 
                     b.Property<DateTime?>("LicenseExpirationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("LicenseNumber")
-                        .IsRequired()
                         .HasMaxLength(12)
                         .IsUnicode(false)
                         .HasColumnType("varchar(12)");
@@ -218,7 +217,8 @@ namespace CarRental.Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("LicenseNumber")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[LicenseNumber] IS NOT NULL");
 
                     b.HasIndex("MembershipId");
 
@@ -241,10 +241,12 @@ namespace CarRental.Infrastructure.Data.Migrations
                     b.Property<DateTime>("ContractEndDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 4, 13, 28, 12, 885, DateTimeKind.Local).AddTicks(1984));
+                        .HasDefaultValue(new DateTime(2024, 6, 4, 19, 43, 43, 664, DateTimeKind.Local).AddTicks(2495));
 
                     b.Property<Guid>("ContractNumber")
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<bool>("IsAvailable")
                         .ValueGeneratedOnAdd()
@@ -254,7 +256,7 @@ namespace CarRental.Infrastructure.Data.Migrations
                     b.Property<DateTime>("JoinDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2023, 12, 4, 13, 28, 12, 885, DateTimeKind.Local).AddTicks(1432));
+                        .HasDefaultValue(new DateTime(2023, 12, 4, 19, 43, 43, 664, DateTimeKind.Local).AddTicks(1988));
 
                     b.Property<string>("LicenceNumber")
                         .IsRequired()
@@ -331,12 +333,12 @@ namespace CarRental.Infrastructure.Data.Migrations
                     b.Property<DateTime>("ReservationEndDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 4, 13, 28, 12, 886, DateTimeKind.Local).AddTicks(2680));
+                        .HasDefaultValue(new DateTime(2024, 6, 4, 19, 43, 43, 665, DateTimeKind.Local).AddTicks(4515));
 
                     b.Property<DateTime>("ReservationStartDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2023, 12, 4, 13, 28, 12, 886, DateTimeKind.Local).AddTicks(2029));
+                        .HasDefaultValue(new DateTime(2023, 12, 4, 19, 43, 43, 665, DateTimeKind.Local).AddTicks(3863));
 
                     b.HasKey("Id");
 

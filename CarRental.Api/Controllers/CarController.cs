@@ -124,12 +124,12 @@ public class CarController : ControllerBase
 
 
 	[HttpPut("updatecar/{id}")]
-	public async Task<ApiResponse<CarDto>> UpdateCar(object id, [FromBody] UpdateCarDto updateCarDto)
+	public async Task<ApiResponse<CarDto>> UpdateCar(Guid id, [FromBody] UpdateCarDto updateCarDto)
 	{
 
 		try
 		{
-			if (updateCarDto is not null && id is not null)
+			if (updateCarDto is not null && !string.IsNullOrWhiteSpace(id.ToString()))
 			{
 				CarDto carDto = await _carService.UpdateCarAsync(id, updateCarDto);
 				return new ApiResponse<CarDto>

@@ -1,8 +1,4 @@
-﻿using CarRental.Core.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-namespace CarRental.Infrastructure.Data.DataBaseConfiguration.EntitiesConfigurations;
+﻿namespace CarRental.Infrastructure.Data.DataBaseConfiguration.EntitiesConfigurations;
 public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 {
 	private string tableName = "Customers";
@@ -22,14 +18,16 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
 		builder.Property(c => c.HasLicence).IsRequired().HasDefaultValue(false);
 
+		builder.Property(c => c.LicenseNumber).IsRequired(false);
 		builder.Property(c => c.LicenseNumber).HasMaxLength(12).IsUnicode(false);
 		builder.HasIndex(c => c.LicenseNumber).IsUnique();//todo : the licence number for the customer is not required
 
 		builder.Property(c => c.LicenseExpirationDate).IsRequired(false);
 
-		builder.Property(c => c.JoinDate).IsRequired();
+		builder.Property(c => c.JoinDate).IsRequired().HasDefaultValue(DateTime.Now);
 
 		builder.Property(c => c.EmergencyContactName).IsRequired(false);
+
 		builder.Property(c => c.EmergencyContactNumber).IsRequired(false);
 
 		builder.Property(c => c.MembershipId).IsRequired();

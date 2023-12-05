@@ -3,7 +3,7 @@
 public record CustomerDto
 {
 	public string Id { get; set; }
-	public ApplicationUserDto UserDto { get; set; }
+	public ApplicationUserDto User { get; set; }
 
 	public bool HasLicence { get; set; }
 	public string LicenseNumber { get; set; }
@@ -11,9 +11,9 @@ public record CustomerDto
 	public DateTime JoinDate { get; set; }
 	public string? EmergencyContactName { get; set; }
 	public string? EmergencyContactNumber { get; set; }
-	public MembershipDto Membership { get; set; }
+	public MembershipDto MembershipLevel { get; set; }
 	public int CurrentlyRentedCarsCount { get; set; }
-	public IEnumerable<RentedCarDto> RentedCars { get; set; }
+	public ICollection<RentedCarDto> RentedCars { get; set; }
 
 
 }

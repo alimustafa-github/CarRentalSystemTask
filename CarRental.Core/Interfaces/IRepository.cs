@@ -1,6 +1,4 @@
-﻿using CarRental.Core.Entities;
-
-namespace CarRental.Core.Interfaces;
+﻿namespace CarRental.Core.Interfaces;
 public interface IRepository<T> where T : class
 {
 	Task<T> GetByIdAsync(object id);

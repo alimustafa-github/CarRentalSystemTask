@@ -1,13 +1,4 @@
-﻿using CarRental.Core.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CarRental.Infrastructure.Data.DataBaseConfiguration.EntitiesConfigurations;
+﻿namespace CarRental.Infrastructure.Data.DataBaseConfiguration.EntitiesConfigurations;
 /// <summary>
 /// This Class will Configure all the columns needed in the Drivers Table
 /// </summary>
@@ -37,10 +28,9 @@ public class DriverConfiguration : IEntityTypeConfiguration<Driver>
 		builder.Property(d => d.LicenceNumber).IsRequired().IsUnicode(false).HasMaxLength(12);
 		builder.HasIndex(d => d.LicenceNumber).IsUnique();
 
-		builder.Property(d => d.LicenseExpirationDate).IsRequired();
-
 		builder.Property(d => d.ContractNumber).IsRequired();
 		builder.HasIndex(d => d.ContractNumber).IsUnique();
+		builder.Property(d => d.ContractNumber).ValueGeneratedOnAdd().HasDefaultValueSql("NEWID()");
 
 		builder.Property(d => d.IsAvailable).IsRequired().HasDefaultValue(true);
 

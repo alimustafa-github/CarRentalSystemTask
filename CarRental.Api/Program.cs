@@ -26,7 +26,7 @@ builder.Services.AddTransient<ICarService, CarService>();
 builder.Services.AddScoped<IJwtTokenGenerator,JwtTokenGenerator>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddTransient<EfCoreCarRepository>();
-builder.Services.AddTransient<EfCoreUserRepository>();
+//builder.Services.AddTransient<EfCoreUserRepository>();
 
 //builder.Services.AddTransient(typeof(EfCoreRepository<,>));
 

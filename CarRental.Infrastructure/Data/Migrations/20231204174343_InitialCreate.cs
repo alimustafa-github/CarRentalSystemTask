@@ -31,9 +31,9 @@ namespace CarRental.Infrastructure.Data.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: false),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CurrentAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: true),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CurrentAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsCustomer = table.Column<bool>(type: "bit", nullable: false),
                     IsDriver = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -193,11 +193,11 @@ namespace CarRental.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     TotalRentalCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
-                    JoinDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2023, 12, 4, 13, 28, 12, 885, DateTimeKind.Local).AddTicks(1432)),
-                    ContractEndDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 6, 4, 13, 28, 12, 885, DateTimeKind.Local).AddTicks(1984)),
+                    JoinDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2023, 12, 4, 19, 43, 43, 664, DateTimeKind.Local).AddTicks(1988)),
+                    ContractEndDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 6, 4, 19, 43, 43, 664, DateTimeKind.Local).AddTicks(2495)),
                     LicenceNumber = table.Column<string>(type: "varchar(12)", unicode: false, maxLength: 12, nullable: false),
                     LicenseExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ContractNumber = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ContractNumber = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     IsAvailable = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     AlternativeDriverId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
@@ -225,9 +225,9 @@ namespace CarRental.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     HasLicence = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    LicenseNumber = table.Column<string>(type: "varchar(12)", unicode: false, maxLength: 12, nullable: false),
+                    LicenseNumber = table.Column<string>(type: "varchar(12)", unicode: false, maxLength: 12, nullable: true),
                     LicenseExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    JoinDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    JoinDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2023, 12, 4, 19, 43, 43, 666, DateTimeKind.Local).AddTicks(306)),
                     EmergencyContactName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EmergencyContactNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MembershipId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
@@ -287,8 +287,8 @@ namespace CarRental.Infrastructure.Data.Migrations
                     DriverId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReservationStartDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2023, 12, 4, 13, 28, 12, 886, DateTimeKind.Local).AddTicks(2029)),
-                    ReservationEndDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 6, 4, 13, 28, 12, 886, DateTimeKind.Local).AddTicks(2680))
+                    ReservationStartDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2023, 12, 4, 19, 43, 43, 665, DateTimeKind.Local).AddTicks(3863)),
+                    ReservationEndDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 6, 4, 19, 43, 43, 665, DateTimeKind.Local).AddTicks(4515))
                 },
                 constraints: table =>
                 {
@@ -378,7 +378,8 @@ namespace CarRental.Infrastructure.Data.Migrations
                 name: "IX_Customers_LicenseNumber",
                 table: "Customers",
                 column: "LicenseNumber",
-                unique: true);
+                unique: true,
+                filter: "[LicenseNumber] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Customers_MembershipId",

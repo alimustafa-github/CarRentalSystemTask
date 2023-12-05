@@ -1,6 +1,6 @@
 ﻿namespace CarRental.Api.Dtos.UserDtos;
 
-public class LoginRequestDto
+public record LoginRequestDto
 {
     public string Email { get; set; }
 

@@ -1,12 +1,4 @@
-﻿using CarRental.Core.Entities;
-using CarRental.Infrastructure.Data.DataBaseConfiguration;
-using CarRental.Infrastructure.Data.DataBaseConfiguration.EntitiesConfigurations;
-using CarRental.Infrastructure.Data.DataBaseConfiguration.IdentityConfigurations;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-
-namespace CarRental.Infrastructure.Data;
+﻿namespace CarRental.Infrastructure.Data;
 public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
 	public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)

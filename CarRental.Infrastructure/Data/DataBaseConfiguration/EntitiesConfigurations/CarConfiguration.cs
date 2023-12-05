@@ -1,8 +1,4 @@
-﻿using CarRental.Core.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-namespace CarRental.Infrastructure.Data.DataBaseConfiguration.EntitiesConfigurations;
+﻿namespace CarRental.Infrastructure.Data.DataBaseConfiguration.EntitiesConfigurations;
 /// <summary>
 /// This Class will Configure all the columns needed in the Cars Table
 /// </summary>
