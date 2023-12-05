@@ -20,10 +20,14 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 
 	public async Task<TEntity> DeleteAsync(object id)
 	{
-		var entity = await _context.Set<TEntity>().FindAsync(id);
-		if (entity == null)
+		if (id is null)
 		{
-			return entity;
+			throw new ArgumentNullException("The Identifier must not be null");
+		}
+		var entity = await _context.Set<TEntity>().FindAsync(id);
+		if (entity is null)
+		{
+			throw new ArgumentNullException("There is no Entity Corresponds with the given Identifier");
 		}
 
 		_context.Set<TEntity>().Remove(entity);
@@ -100,7 +104,7 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 	/// <param name="propertyName"></param>
 	/// <param name="value"></param>
 	/// <returns></returns>
-	public async Task<IEnumerable<TEntity>> FilterTheRecords(string value, string propertyName)
+	public async Task<IEnumerable<TEntity>> FilterTheRecords(string propertyName, string value	)
 	{
 		// Get the property info for the specified property name
 		var propertyInfo = typeof(TEntity).GetProperty(propertyName);
@@ -108,20 +112,27 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 		// Create a parameter expression for the entity type
 		var parameter = Expression.Parameter(typeof(TEntity));
 
+		// Convert the input value to a string
+		var stringValue = value.ToString();
+
 		// Create an expression representing accessing the specified property
 		var propertyAccess = Expression.Property(parameter, propertyInfo);
 
-		// Create an expression representing the equality check with the provided keyword
-		var equals = Expression.Equal(propertyAccess, Expression.Constant(value));
+		// Convert the property to a string using the ToString() method
+		var toStringMethod = typeof(object).GetMethod("ToString");
+		var toStringExpression = Expression.Call(propertyAccess, toStringMethod);
 
-		// Combine the property access and equality check into a lambda expression
-		var lambda = Expression.Lambda<Func<TEntity, bool>>(equals, parameter);
+		// Create an expression representing the 'Contains' operation on the string
+		var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+		var containsExpression = Expression.Call(toStringExpression, containsMethod, Expression.Constant(stringValue));
+
+		// Combine the property access and 'contains' expression into a lambda expression
+		var lambda = Expression.Lambda<Func<TEntity, bool>>(containsExpression, parameter);
 
 		// Use the lambda expression in a Where clause to filter the entities
-		//var filteredEntities =await _context.Set<TEntity>().ToListAsync().Where(lambda);
-
-		var filteredEntities = _context.Set<TEntity>().Where(lambda);
+		var filteredEntities = await _context.Set<TEntity>().Where(lambda).ToListAsync();
 
 		return filteredEntities;
 	}
+
 }

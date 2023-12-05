@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-
-namespace CarRental.Api.Controllers;
+﻿namespace CarRental.Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class DriverController : ControllerBase
