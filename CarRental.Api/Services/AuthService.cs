@@ -13,6 +13,7 @@ public class AuthService : IAuthService
 		_roleManager = roleManager;
 		_jwtTokenGenerator = jwtTokenGenerator;
 		_mapper = mapper;
+
 	}
 
 

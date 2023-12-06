@@ -10,12 +10,8 @@ public class AddDriverDtoValidator : AbstractValidator<AddDriverDto>
 		   .Must(BeWithinOneMonth)
 		   .WithMessage("Date must be within one month from the current date.");
 
-		RuleFor(d => d.LicenceNumber).NotEmpty().Length(6).WithMessage("The LicenceNumber should only be 6 charachters longs")
+		RuleFor(d => d.LicenceNumber).NotEmpty().Length(8).WithMessage("The LicenceNumber should exactly be 8 charachters longs")
 			.Must(licenceNumber => !licenceNumber.ToString().Contains(" ")).WithMessage("The LicenceNumber must not contain any spaces");
-
-
-		RuleFor(x => x.AlternativeDriverId)
-				.Must(id => Guid.TryParse(id.ToString(), out _)).WithMessage("Invalid DriverId format,Make sure it is Guid");
 
 	}
 

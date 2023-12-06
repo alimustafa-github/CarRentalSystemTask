@@ -10,5 +10,5 @@ public record DriverDto
 	public string LicenceNumber { get; set; }
 	public DateTime LicenseExpirationDate { get; set; }
 	public bool IsAvailable { get; set; }
-	public AlternativeDriverDto AlternativeDriver { get; set; }
+	public Guid AlternativeDriverId { get; set; }
 }

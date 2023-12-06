@@ -8,7 +8,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.RegisterAppServices();
-
 builder.AddAppAuthentication();
 
 var app = builder.Build();

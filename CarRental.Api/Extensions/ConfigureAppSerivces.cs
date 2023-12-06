@@ -73,6 +73,5 @@ public static class ConfigureAppSerivces
 			options.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Information)));
 		});
 
-
 	}
 }

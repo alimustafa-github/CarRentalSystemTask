@@ -2,6 +2,8 @@
 
 public interface IDriverService
 {
+	public event EventHandler<RegistrationRequestDto> OnDriverRegistration;
+
 	Task<DriverDto> AddDriverAsync(AddDriverDto addDriverDto);
 	Task<IEnumerable<DriverDto>> GetDriversAsync(int pageNumber, int pageSize);
 	Task<DriverDto> DeleteDriverAsync(object id);
