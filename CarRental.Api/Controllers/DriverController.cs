@@ -14,38 +14,14 @@ public class DriverController : ControllerBase
 	[HttpPost("adddriver")]
 	public async Task<ApiResponse<DriverDto>> AddDriver([FromBody] AddDriverDto addDriverDto)
 	{
-		try
+		DriverDto driverDto = await _driverService.AddDriverAsync(addDriverDto);
+		return new ApiResponse<DriverDto>
 		{
-			DriverDto driverDto = await _driverService.AddDriverAsync(addDriverDto);
-			if (driverDto is not null)
-			{
-				return new ApiResponse<DriverDto>
-				{
-					IsSuccess = true,
-					Data = driverDto,
-					Message = "Add Successfully"
-				};
-			}
-			else
-			{
-				return new ApiResponse<DriverDto>
-				{
-					IsSuccess = false,
-					Data = null,
-					Message = "failed"
-				};
-			}
-		}
-		catch (Exception ex)
-		{
-
-			return new ApiResponse<DriverDto>
-			{
-				IsSuccess = false,
-				Data = null,
-				Message = "Exception happened"
-			};
-		}
+			IsSuccess = true,
+			Data = driverDto,
+			StatusCode = StatusCodes.Status201Created,
+			Message = "Add Successfully"
+		};
 	}
 
 
@@ -53,38 +29,15 @@ public class DriverController : ControllerBase
 	[HttpGet("getdrivers/{pageNumber}/{pageSize}")]
 	public async Task<ApiResponse<IEnumerable<DriverDto>>> GetAllDrivers(int pageNumber, int pageSize = 15)
 	{
-		try
-		{
-			IEnumerable<DriverDto> driverDtos = await _driverService.GetDriversAsync(pageNumber, pageSize);
+		IEnumerable<DriverDto> driverDtos = await _driverService.GetDriversAsync(pageNumber, pageSize);
 
-			if (driverDtos is not null)
-			{
-				return new ApiResponse<IEnumerable<DriverDto>>
-				{
-					IsSuccess = true,
-					Data = driverDtos,
-					Message =string.Empty
-				};
-			}
-			else
-			{
-				return new ApiResponse<IEnumerable<DriverDto>>
-				{
-					IsSuccess = true,
-					Data = null,
-					Message = "We do not have any drivers yet"
-				};
-			}
-		}
-		catch (Exception ex)
+		return new ApiResponse<IEnumerable<DriverDto>>
 		{
-			return new ApiResponse<IEnumerable<DriverDto>>
-			{
-				IsSuccess = false,
-				Data = Enumerable.Empty<DriverDto>(),
-				Message = ex.Message
-			};
-		}
+			IsSuccess = true,
+			Data = driverDtos,
+			StatusCode = StatusCodes.Status200OK,
+			Message = string.Empty
+		};
 	}
 
 
@@ -92,78 +45,29 @@ public class DriverController : ControllerBase
 	[HttpGet("getdriverbyid/{id}")]
 	public async Task<ApiResponse<DriverDto>> GetDriverById(Guid id)
 	{
-		try
+		DriverDto driverDto = await _driverService.GetDriverByIdAsync(id);
+		return new ApiResponse<DriverDto>
 		{
-			DriverDto driverDto = await _driverService.GetDriverByIdAsync(id);
-			if (driverDto is not null)
-			{
-				return new ApiResponse<DriverDto>
-				{
-					IsSuccess = true,
-					Data = driverDto,
-					Message = string.Empty
-				};
-			}
-			else
-			{
-				return new ApiResponse<DriverDto>()
-				{
-					IsSuccess = false,
-					Data = null,
-					Message = "there is no driver corresponds with the entered Id"
-				};
-			}
-
-		}
-		catch (Exception ex)
-		{
-			return new ApiResponse<DriverDto>()
-			{
-				IsSuccess = false,
-				Data = null,
-				Message = ex.Message
-			};
-		}
+			IsSuccess = true,
+			Data = driverDto,
+			StatusCode = StatusCodes.Status200OK,
+			Message = string.Empty
+		};
 	}
 
 
 	[HttpDelete("deletedriver/{id}")]
 	public async Task<ApiResponse<DriverDto>> DeleteDriverById(Guid id)
 	{
+		DriverDto driverDto = await _driverService.DeleteDriverAsync(id);
 
-		try
+		return new ApiResponse<DriverDto>
 		{
-			DriverDto driverDto = await _driverService.DeleteDriverAsync(id);
-
-			if (driverDto is not null)
-			{
-				return new ApiResponse<DriverDto>
-				{
-					IsSuccess = true,
-					Data = driverDto,
-					Message = "Deleted Successfully"
-				};
-			}
-			else
-			{
-				return new ApiResponse<DriverDto>()
-				{
-					IsSuccess = false,
-					Data = null,
-					Message = "there is no driver corresponds with the entered Id"
-				};
-			}
-
-		}
-		catch (Exception ex)
-		{
-			return new ApiResponse<DriverDto>()
-			{
-				IsSuccess = false,
-				Data = null,
-				Message = ex.Message
-			};
-		}
+			IsSuccess = true,
+			Data = driverDto,
+			StatusCode = StatusCodes.Status204NoContent,
+			Message = string.Empty
+		};
 	}
 
 
@@ -171,74 +75,40 @@ public class DriverController : ControllerBase
 	[HttpGet("sortdriversbyid/{pageNumber}/{pageSize}")]
 	public async Task<ApiResponse<IEnumerable<DriverDto>>> SortDriversById(int pageNumber, int pageSize = 15)
 	{
-		try
-		{
-			IEnumerable<DriverDto> driverDtos = await _driverService.SortDriversById(pageNumber, pageSize);
+		IEnumerable<DriverDto> driverDtos = await _driverService.SortDriversById(pageNumber, pageSize);
 
-			if (driverDtos is not null)
-			{
-				return new ApiResponse<IEnumerable<DriverDto>>
-				{
-					IsSuccess = true,
-					Data = driverDtos,
-					Message = string.Empty
-				};
-			}
-			else
-			{
-				return new ApiResponse<IEnumerable<DriverDto>>
-				{
-					IsSuccess = true,
-					Data = null,
-					Message = "We do not have any drivers yet"
-				};
-			}
-		}
-		catch (Exception ex)
+		return new ApiResponse<IEnumerable<DriverDto>>
 		{
-			return new ApiResponse<IEnumerable<DriverDto>>
-			{
-				IsSuccess = false,
-				Data = Enumerable.Empty<DriverDto>(),
-				Message = ex.Message
-			};
-		}
+			IsSuccess = true,
+			Data = driverDtos,
+			StatusCode = StatusCodes.Status200OK,
+			Message = string.Empty
+		};
 	}
 
 
 	[HttpGet("searchfordriver/{licenceNumber}")]
 	public async Task<ApiResponse<DriverDto>> SearchForDriverByLicenceNumber(string licenceNumber)
 	{
-		try
+		DriverDto driverDto = await _driverService.SearchForDriverByLicenceNumberAsync(licenceNumber);
+		if (driverDto is not null)
 		{
-			DriverDto driverDto = await _driverService.SearchForDriverByLicenceNumberAsync(licenceNumber);
-			if (driverDto is not null)
+			return new ApiResponse<DriverDto>
 			{
-				return new ApiResponse<DriverDto>
-				{
-					IsSuccess = true,
-					Data = driverDto,
-					Message = string.Empty
-				};
-			}
-			else
-			{
-				return new ApiResponse<DriverDto>()
-				{
-					IsSuccess = false,
-					Data = null,
-					Message = "there is no driver corresponds with the entered LicenceNumber"
-				};
-			}
-
+				IsSuccess = true,
+				Data = driverDto,
+				StatusCode = StatusCodes.Status200OK,
+				Message = string.Empty
+			};
 		}
-		catch (Exception ex)
+		else
 		{
 			return new ApiResponse<DriverDto>()
 			{
 				IsSuccess = false,
 				Data = null,
-				Message = ex.Message
+				StatusCode = StatusCodes.Status404NotFound,
+				Message = "there is no driver corresponds with the entered LicenceNumber"
 			};
 		}
 	}
