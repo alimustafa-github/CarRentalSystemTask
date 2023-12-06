@@ -86,40 +86,14 @@ public class CarController : ControllerBase
 	[HttpPost("addcar")]
 	public async Task<ApiResponse<CarDto>> AddCar([FromBody] AddCarDto addCarDto)
 	{
-
-		try
+		CarDto carDto = await _carService.AddCarAsync(addCarDto);
+		return new ApiResponse<CarDto>
 		{
-			if (addCarDto != null)
-			{
-				CarDto carDto = await _carService.AddCarAsync(addCarDto);
-				return new ApiResponse<CarDto>
-				{
-					IsSuccess = true,
-					Data = carDto,
-					StatusCode = StatusCodes.Status201Created,
-					Message = "Car Added Successfully"
-				};
-			}
-			else
-			{
-				return new ApiResponse<CarDto>
-				{
-					IsSuccess = false,
-					Data = null,
-					StatusCode = StatusCodes.Status400BadRequest,
-					Message = "Could not Add the Car"
-				};
-			}
-		}
-		catch (Exception ex)
-		{
-			return new ApiResponse<CarDto>
-			{
-				IsSuccess = false,
-				Data = null,
-				Message = ex.Message
-			};
-		}
+			IsSuccess = true,
+			Data = carDto,
+			StatusCode = StatusCodes.Status201Created,
+			Message = "Car Added Successfully"
+		};
 	}
 
 
@@ -127,79 +101,28 @@ public class CarController : ControllerBase
 	[HttpPut("updatecar/{id}")]
 	public async Task<ApiResponse<CarDto>> UpdateCar(Guid id, [FromBody] UpdateCarDto updateCarDto)
 	{
-		if (!string.IsNullOrWhiteSpace(id.ToString()))
+		CarDto carDto = await _carService.UpdateCarAsync(id, updateCarDto);
+		return new ApiResponse<CarDto>
 		{
-			CarDto carDto = await _carService.UpdateCarAsync(id, updateCarDto);
-			return new ApiResponse<CarDto>
-			{
-				IsSuccess = true,
-				Data = carDto,
-				StatusCode = StatusCodes.Status200OK,
-				Message = "Car Updated Successfully"
-			};
-		}
-		else
-		{
-			return new ApiResponse<CarDto>
-			{
-				IsSuccess = false,
-				Data = null,
-				StatusCode = StatusCodes.Status400BadRequest,
-				Message = "Could not update the car"
-			};
-		}
+			IsSuccess = true,
+			Data = carDto,
+			StatusCode = StatusCodes.Status200OK,
+			Message = "Car Updated Successfully"
+		};
 	}
 
 
 	[HttpDelete("deletecarbyid/{id}")]
 	public async Task<ApiResponse<CarDto>> DeleteCar(object id)
 	{
-
-		try
+		CarDto carDto = await _carService.DeleteCarAsync(id);
+		return new ApiResponse<CarDto>
 		{
-			if (!string.IsNullOrWhiteSpace(id.ToString()))
-			{
-				CarDto carDto = await _carService.DeleteCarAsync(id);
-				if (carDto is not null)
-				{
-					return new ApiResponse<CarDto>
-					{
-						IsSuccess = true,
-						Data = carDto,
-						StatusCode = StatusCodes.Status204NoContent,
-						Message = "Car Deleted Successfully"
-					};
-				}
-				else
-				{
-					return new ApiResponse<CarDto>
-					{
-						IsSuccess = false,
-						Data = null,
-						Message = "there is no car corresponds to the entered identifier"
-					};
-				}
-
-			}
-			else
-			{
-				return new ApiResponse<CarDto>
-				{
-					IsSuccess = false,
-					Data = null,
-					Message = "Could not Delete the Car"
-				};
-			}
-		}
-		catch (Exception ex)
-		{
-			return new ApiResponse<CarDto>
-			{
-				IsSuccess = false,
-				Data = null,
-				Message = ex.Message
-			};
-		}
+			IsSuccess = true,
+			Data = carDto,
+			StatusCode = StatusCodes.Status204NoContent,
+			Message = "Car Deleted Successfully"
+		};
 	}
 
 
