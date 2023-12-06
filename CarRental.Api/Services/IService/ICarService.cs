@@ -3,9 +3,9 @@ public interface ICarService
 {
 	Task<CarDto> AddCarAsync(AddCarDto carDto);
 	Task<CarDto> DeleteCarAsync(object id);
-	Task<IEnumerable<CarDto>> GetCarsAsync(int numberToSkip, int numberToTake);
+	Task<IEnumerable<CarDto>> GetCarsAsync(int pageNumber, int pageSize);
 	Task<CarDto> SearchForCarBySerialNumberAsync(int serialNumber);
-	Task<IEnumerable<CarDto>> SortCarsBySerialNumber(int numberToSkip, int numberToTake);
+	Task<IEnumerable<CarDto>> SortCarsBySerialNumber(int pageNumber, int pageSize);
 	Task<CarDto> UpdateCarAsync(object carId, UpdateCarDto carDto);
 	Task<CarDto> GetCarByIdAsync(Guid id);
 

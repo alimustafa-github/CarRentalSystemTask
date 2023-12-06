@@ -3,7 +3,7 @@ public record AddCarDto
 {
 	public int SerialNumber { get; set; }
 
-	public CarTypeDto Type { get; set; }
+	public Guid CarTypeId { get; set; }
 	public decimal DailyFaire { get; set; }
 
 	public Color Color { get; set; }
@@ -11,5 +11,5 @@ public record AddCarDto
 
     public bool IsRented { get; set; }
 
-    public DriverDto Driver { get; set; }
+    public Guid DriverId { get; set; }
 }

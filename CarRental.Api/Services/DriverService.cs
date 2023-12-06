@@ -17,6 +17,7 @@ public class DriverService : IDriverService
 		_driverRepository = driverRepository;
 		_mapper = mapper;
 	}
+
 	public async Task<DriverDto> AddDriverAsync(AddDriverDto addDriverDto)
 	{
 		try
@@ -152,6 +153,7 @@ public class DriverService : IDriverService
 			throw;
 		}
 	}
+
 	public async Task<DriverDto> SearchForDriverByLicenceNumberAsync(string licenceNumber)
 	{
 		try
@@ -176,7 +178,6 @@ public class DriverService : IDriverService
 
 	}
 
-
 	public async Task<IEnumerable<DriverDto>> SortDriversById(int pageNumber, int pageSize)
 	{
 		try
@@ -198,5 +199,6 @@ public class DriverService : IDriverService
 			throw;
 		}
 	}
+
 
 }

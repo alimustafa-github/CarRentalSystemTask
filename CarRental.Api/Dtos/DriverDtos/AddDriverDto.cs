@@ -3,7 +3,6 @@
 public record AddDriverDto
 {
 	public RegistrationRequestDto User { get; set; }
-	public int TotalRentalCount { get; set; }
 	public DateTime JoinDate { get; set; }
 	public DateTime ContractEndDate { get; set; }
 	public string LicenceNumber { get; set; }

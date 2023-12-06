@@ -1,15 +1,21 @@
 ﻿namespace CarRental.Api;
 
-public class MappingConfig
+public class MappingConfig : Profile
 {
-	public static MapperConfiguration RegisterMaps()
+
+    public static MapperConfiguration RegisterMaps()
 	{
 		var mappingConfig = new MapperConfiguration(config =>
 		{
+
+			config.CreateMap<UpdateCarDto, Car>().ReverseMap();
+
+
 			config.CreateMap<Car, AddCarDto>().ReverseMap();
 			config.CreateMap<Car, CarDto>().ReverseMap();
+
 			config.CreateMap<ApplicationUser, RegistrationRequestDto>().ReverseMap();
-			config.CreateMap<ApplicationUser,ApplicationUserDto>().ReverseMap();
+			config.CreateMap<ApplicationUser, ApplicationUserDto>().ReverseMap();
 			config.CreateMap<RoleDto, IdentityRole>().ReverseMap();
 
 			config.CreateMap<AlternativeDriverDto, Driver>().ReverseMap();

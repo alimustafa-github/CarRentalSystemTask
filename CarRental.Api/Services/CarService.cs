@@ -1,4 +1,6 @@
-﻿namespace CarRental.Api.Services;
+﻿using System.Runtime.InteropServices;
+
+namespace CarRental.Api.Services;
 
 public class CarService : ICarService
 {
@@ -13,32 +15,71 @@ public class CarService : ICarService
 
 	public async Task<IEnumerable<CarDto>> GetCarsAsync(int pageNumber, int pageSize)
 	{
-		IQueryable<Car> cars = _carRepository.GetFromCacheAsync(pageNumber, pageSize).Result.AsQueryable();
-		return _mapper.Map<IEnumerable<CarDto>>(cars);
+		try
+		{
+			IEnumerable<Car> cars = await _carRepository.GetFromCacheAsync(pageNumber, pageSize);
+			if (cars is null)
+			{
+				throw new ArgumentNullException(nameof(cars));
+			}
+			return _mapper.Map<IEnumerable<CarDto>>(cars);
+		}
+		catch (ArgumentNullException ex)
+		{
+			throw;
+		}
+		catch (DbUpdateException ex)
+		{
+			throw;
+		}
+		catch (Exception ex)
+		{
+			throw;
+		}
 	}
 
 	public async Task<CarDto> GetCarByIdAsync(Guid id)
 	{
-		Car car = await _carRepository.GetByIdAsync(id);
-		if (car is not null)
+		try
 		{
+			Car car = await _carRepository.GetByIdAsync(id);
+			if (car is null)
+			{
+				throw new ArgumentNullException(nameof(car));
+			}
 			return _mapper.Map<CarDto>(car);
 		}
-		return null;
+		catch (ArgumentNullException ex)
+		{
+			throw;
+		}
+		catch (Exception ex)
+		{
+			throw;
+		}
 	}
 
 	public async Task<CarDto> AddCarAsync(AddCarDto addCarDto)
 	{
-		if (addCarDto is not null)
+		try
 		{
+			if (addCarDto is null)
+			{
+				throw new ArgumentNullException();
+			}
+
 			Car car = _mapper.Map<Car>(addCarDto);
 			car = await _carRepository.AddAsync(car);
 			CarDto carDto = _mapper.Map<CarDto>(car);
 			return carDto;
 		}
-		else
+		catch (ArgumentNullException ex)
 		{
-			return null;
+			throw;
+		}
+		catch (Exception)
+		{
+			throw;
 		}
 	}
 
@@ -46,10 +87,20 @@ public class CarService : ICarService
 	{
 		if (updateCarDto is not null && carId is not null)
 		{
+
 			Car car = await _carRepository.GetByIdAsync(carId);
-			car = _mapper.Map<Car>(updateCarDto);
-			await _carRepository.UpdateAsync(car);
-			return _mapper.Map<CarDto>(car);
+			if (car is not null)
+			{
+				//car = _mapper.Map<Car>(updateCarDto);
+				car = _mapper.Map(updateCarDto, car);
+				await _carRepository.UpdateAsync(car);
+				return _mapper.Map<CarDto>(car);
+			}
+			else
+			{
+				throw new InvalidOperationException();
+			}
+
 		}
 		else
 		{
@@ -59,28 +110,38 @@ public class CarService : ICarService
 
 	public async Task<CarDto> DeleteCarAsync(object id)
 	{
-		return _mapper.Map<CarDto>(await _carRepository.DeleteAsync(id));
+		Car car = await _carRepository.DeleteAsync(id);
+		if (car is not null)
+		{
+			CarDto carDto = _mapper.Map<CarDto>(car);
+			return carDto;
+		}
+		return null;
 	}
 
 	public async Task<CarDto> SearchForCarBySerialNumberAsync(int serialNumber)
 	{
 		string propertyName = "SerialNumber";
-		CarDto car = _mapper.Map<CarDto>(await _carRepository.SearchForEntityAsync(propertyName, serialNumber));
-
-		return car;
+		Car car = await _carRepository.SearchForEntityAsync(propertyName, serialNumber);
+		CarDto carDto = _mapper.Map<CarDto>(car);
+		return carDto;
 	}
 
 
 	public async Task<IEnumerable<CarDto>> SortCarsBySerialNumber(int pageNumber, int pageSize)
 	{
-		return _mapper.Map<IEnumerable<CarDto>>(await _carRepository.SortAsync(car => car.SerialNumber, pageNumber, pageSize));
+		IEnumerable<Car> cars = await _carRepository.SortAsync(c => c.SerialNumber, pageNumber, pageSize);
+		IEnumerable<CarDto> carDtos = _mapper.Map<IEnumerable<CarDto>>(cars);
+		return carDtos;
+
 	}
 
-	public async Task<IEnumerable<CarDto>> FilterTheCarsBySerialNumber( string value)
+	public async Task<IEnumerable<CarDto>> FilterTheCarsBySerialNumber(string value)
 	{
 		//todo : handle the errors if any 
 		string propertyName = "SerialNumber";
-		IEnumerable<CarDto> carDtos = _mapper.Map<IEnumerable<CarDto>>(await _carRepository.FilterTheRecords(propertyName, value));
+		IEnumerable<Car> cars = await _carRepository.FilterTheRecords(propertyName, value);
+		IEnumerable<CarDto> carDtos = _mapper.Map<IEnumerable<CarDto>>(cars);
 		return carDtos;
 	}
 }

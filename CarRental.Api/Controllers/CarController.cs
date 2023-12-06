@@ -1,7 +1,6 @@
 ﻿namespace CarRental.Api.Controllers;
 [Route("api/car")]
 [ApiController]
-[Authorize]
 public class CarController : ControllerBase
 {
 	private readonly ICarService _carService;

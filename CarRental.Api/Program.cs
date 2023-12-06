@@ -17,6 +17,7 @@ builder.Services.AddSingleton(mapper);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
+
 //Register the fluent Validation as a serivce
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
@@ -68,7 +69,12 @@ builder.Services.AddAuthorization();
 //Configure the program to work with sql database
 string connectionString = builder.Configuration.GetConnectionString("MyConnection");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString).LogTo(Console.WriteLine, LogLevel.Information));
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+	options.UseSqlServer(connectionString);
+	options.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()));
+	options.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Information)));
+});
 
 
 
