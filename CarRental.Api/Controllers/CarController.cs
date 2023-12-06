@@ -96,7 +96,7 @@ public class CarController : ControllerBase
 				{
 					IsSuccess = true,
 					Data = carDto,
-					StatusCode = StatusCodes.Status201Created
+					StatusCode = StatusCodes.Status201Created,
 					Message = "Car Added Successfully"
 				};
 			}
@@ -106,7 +106,7 @@ public class CarController : ControllerBase
 				{
 					IsSuccess = false,
 					Data = null,
-					StatusCode = StatusCodes.Status400BadRequest
+					StatusCode = StatusCodes.Status400BadRequest,
 					Message = "Could not Add the Car"
 				};
 			}

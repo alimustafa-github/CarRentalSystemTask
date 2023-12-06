@@ -97,7 +97,7 @@ public class DriverController : ControllerBase
 			{
 				IsSuccess = true,
 				Data = driverDto,
-				StatusCode = StatusCodes.Status200OK
+				StatusCode = StatusCodes.Status200OK,
 				Message = string.Empty
 			};
 		}
