@@ -1,19 +1,17 @@
 ﻿namespace CarRental.Api;
 
-public class MappingConfig
+public class MappingConfig : Profile
 {
-	public static MapperConfiguration RegisterMaps()
+
+    public static MapperConfiguration RegisterMaps()
 	{
 		var mappingConfig = new MapperConfiguration(config =>
 		{
-			config.CreateMap<UpdateCarDto, Car>()
-				.ForMember(dest => dest.IsRented, opt => opt.MapFrom(src => src.IsRented))
-		   		.ForMember(d => d.DriverId, d => d.MapFrom(src => src.DriverId)).
-				 ForMember(d => d.DailyFaire, d => d.MapFrom(src => src.DailyFaire)).ReverseMap();
+
+			config.CreateMap<UpdateCarDto, Car>().ReverseMap();
 
 
 			config.CreateMap<Car, AddCarDto>().ReverseMap();
-			//config.CreateMap<Car, UpdateCarDto>().ReverseMap();
 			config.CreateMap<Car, CarDto>().ReverseMap();
 
 			config.CreateMap<ApplicationUser, RegistrationRequestDto>().ReverseMap();

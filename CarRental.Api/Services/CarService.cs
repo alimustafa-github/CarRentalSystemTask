@@ -91,7 +91,8 @@ public class CarService : ICarService
 			Car car = await _carRepository.GetByIdAsync(carId);
 			if (car is not null)
 			{
-				car = _mapper.Map<Car>(updateCarDto);
+				//car = _mapper.Map<Car>(updateCarDto);
+				car = _mapper.Map(updateCarDto, car);
 				await _carRepository.UpdateAsync(car);
 				return _mapper.Map<CarDto>(car);
 			}

@@ -65,7 +65,6 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 			//the data will stay in Cache for two minutes
 			_memoryCache.Set("caching", entities, TimeSpan.FromMinutes(2));
 		}
-
 		return entities;
 	}
 
