@@ -25,7 +25,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 //Register our Custom serivces here
 builder.Services.AddTransient<ICarService, CarService>();
 builder.Services.AddTransient<IDriverService, DriverService>();
-builder.Services.AddScoped<IJwtTokenGenerator,JwtTokenGenerator>();
+builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddTransient<EfCoreCarRepository>();
 builder.Services.AddTransient<EfCoreDriverRepository>();
@@ -80,7 +80,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 
 var app = builder.Build();
-
+app.ConfigureExceptionHandler();
 
 
 // Configure the HTTP request pipeline.

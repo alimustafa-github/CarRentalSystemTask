@@ -1,4 +1,5 @@
 ﻿using CarRental.Api.Dtos.CarDtos;
+using CarRental.Api.Dtos.DriverDtos;
 using CarRental.Core.Entities;
 using Microsoft.Data.SqlClient;
 
@@ -20,184 +21,91 @@ public class DriverService : IDriverService
 
 	public async Task<DriverDto> AddDriverAsync(AddDriverDto addDriverDto)
 	{
-		try
+		//todo : this is not right to register the user here create an event and notify the Responsilbe Service to create a new user.
+		Driver driver = _mapper.Map<Driver>(addDriverDto);
+		if (driver is null || driver.User is null)
 		{
-			//todo : this is not right to register the user here create an event and notify the Unit to create a new user.
-			Driver driver = _mapper.Map<Driver>(addDriverDto);
-			if (driver is null || driver.User is null)
-			{
-				throw new ArgumentNullException("Please Check that the Inputs are correct");
-			}
-			await _userManager.CreateAsync(driver.User);
-			driver.UserId = driver.User.Id;
-			await _driverRepository.AddAsync(driver);
-			DriverDto driverDto = _mapper.Map<DriverDto>(driver);
-			if (driverDto is null)
-			{
-				throw new ArgumentNullException("The driverDto object was null");
-			}
-			return driverDto;
+			throw new ArgumentNullException("Please Check that the Inputs are correct");
 		}
-		//todo :  Log Then Throw 
-		catch (ArgumentNullException ex)
+		await _userManager.CreateAsync(driver.User);
+		driver.UserId = driver.User.Id;
+		await _driverRepository.AddAsync(driver);
+		DriverDto driverDto = _mapper.Map<DriverDto>(driver);
+		if (driverDto is null)
 		{
-			throw;
+			throw new ArgumentNullException("The Driver was Successfully Added to the Database but there was error while mapping");
 		}
-		catch (ArgumentException ex)
-		{
-			throw;
-
-			// Handle ArgumentException
-		}
-		catch (InvalidOperationException ex)
-		{
-			throw;
-
-			// Handle InvalidOperationException
-		}
-		catch (AggregateException ex)
-		{
-			throw;
-
-			// Handle AggregateException and its inner exceptions
-			foreach (var innerException in ex.InnerExceptions)
-			{
-				// Handle each inner exception
-			}
-		}
-		catch (Exception ex)
-		{
-
-			throw;
-		}
+		return driverDto;
 
 	}
 
 	public async Task<DriverDto> DeleteDriverAsync(object id)
 	{
-		try
-		{
-			var driver = await _driverRepository.DeleteAsync(id);
-			return _mapper.Map<DriverDto>(driver);
-		}
-		catch (InvalidOperationException ex)
-		{
-			throw;
-		}
-		catch(DbUpdateException ex)
-		{
+		Driver driver = await _driverRepository.DeleteAsync(id);
+		DriverDto driverDto = _mapper.Map<DriverDto>(driver);
 
-			throw new Exception("you are trying to delete a driver who is an alternative driver for another driver");
-		}
-		catch (Exception ex)
+		if (driverDto is null)
 		{
-
-			throw;
+			throw new ArgumentNullException("The driver was deleted but there was error while mapping");
 		}
+		return driverDto;
 	}
 
+	public async Task<IEnumerable<DriverDto>> GetDriversFromCacheAsync(int pageNumber, int pageSize)
+	{
+		IEnumerable<Driver> drivers = await _driverRepository.GetFromCacheAsync(pageNumber, pageSize);
+		IEnumerable<DriverDto> driverDtos = _mapper.Map<IEnumerable<DriverDto>>(drivers);
+
+		if (driverDtos is null)
+		{
+			throw new ArgumentNullException("Mapping Failed");
+		}
+		return driverDtos;
+	}
 	public async Task<IEnumerable<DriverDto>> GetDriversAsync(int pageNumber, int pageSize)
 	{
-		try
-		{
+		IEnumerable<Driver> drivers = await _driverRepository.GetAllAsync(pageNumber, pageSize);
+		IEnumerable<DriverDto> driverDtos = _mapper.Map<IEnumerable<DriverDto>>(drivers);
 
-			IEnumerable<Driver> drivers = await _driverRepository.GetFromCacheAsync(pageNumber, pageSize);
-			if (drivers is null)
-			{
-				throw new ArgumentNullException("There is Drivers in the Database");
-			}
-			return _mapper.Map<IEnumerable<DriverDto>>(drivers);
-		}
-		catch (ArgumentNullException ex)
+		if (driverDtos is null)
 		{
-			throw;
+			throw new ArgumentNullException("Mapping Failed");
 		}
-		catch (TaskCanceledException ex)
-		{
-			throw;
-		}
-		catch (Exception)
-		{
-
-			throw;
-		}
+		return driverDtos;
 	}
 
 	public async Task<DriverDto> GetDriverByIdAsync(object id)
 	{
-		try
+		if (id is null)
 		{
-			if (id is null)
-			{
-				throw new ArgumentNullException("the id value cannot be null");
-			}
+			throw new ArgumentNullException("the id value cannot be null");
+		}
 
-			Driver driver = await _driverRepository.GetByIdAsync(id);
+		Driver driver = await _driverRepository.GetByIdAsync(id);
+		DriverDto driverDto = _mapper.Map<DriverDto>(driver);
 
-			if (driver is null)
-			{
-				throw new ArgumentNullException("the Driver value cannot be null");
-			}
-			if (driver is not null)
-			{
-				return _mapper.Map<DriverDto>(driver);
-			}
-			return _mapper.Map<DriverDto>(driver);
-		}
-		catch (ArgumentNullException ex)
+		if (driverDto is null)
 		{
-			throw;
+			throw new ArgumentNullException("Mapping Failed");
 		}
-		catch (Exception ex)
-		{
-			throw;
-		}
+		return driverDto;
 	}
 
 	public async Task<DriverDto> SearchForDriverByLicenceNumberAsync(string licenceNumber)
 	{
-		try
-		{
-			string propertyName = "LicenceNumber";
-			Driver driver = await _driverRepository.SearchForEntityAsync(propertyName, licenceNumber);
-			if (driver is null)
-			{
-				throw new ArgumentNullException("There is no Driver corresponds with the given LicenceNumber");
-			}
-			return _mapper.Map<DriverDto>(driver);
-		}
-		catch (ArgumentNullException ex)
-		{
-			throw;
-		}
-		catch (Exception ex)
-		{
+		string propertyName = "LicenceNumber";
+		Driver driver = await _driverRepository.SearchForEntityAsync(propertyName, licenceNumber);
+		DriverDto driverDto = _mapper.Map<DriverDto>(driver);
 
-			throw;
-		}
-
+		return driverDto;
 	}
 
 	public async Task<IEnumerable<DriverDto>> SortDriversById(int pageNumber, int pageSize)
 	{
-		try
-		{
-			IEnumerable<Driver> drivers = await _driverRepository.SortAsync(d => d.Id, pageNumber, pageSize);
-			if (drivers is null)
-			{
-				throw new ArgumentNullException("Something Went wrong");
-			}
-			return _mapper.Map<IEnumerable<DriverDto>>(drivers);
-		}
-		catch (ArgumentNullException ex)
-		{
-			throw;
-		}
-		catch (Exception ex)
-		{
+		IEnumerable<Driver> drivers = await _driverRepository.SortAsync(d => d.Id, pageNumber, pageSize);
 
-			throw;
-		}
+
+		return _mapper.Map<IEnumerable<DriverDto>>(drivers);
 	}
 
 

@@ -10,4 +10,6 @@ public interface IDriverService
     Task<DriverDto> SearchForDriverByLicenceNumberAsync(string licenceNumber);
 	Task<IEnumerable<DriverDto>> SortDriversById(int pageNumber, int pageSize);
 
+	Task<IEnumerable<DriverDto>> GetDriversFromCacheAsync(int pageNumber, int pageSize);
+
 }

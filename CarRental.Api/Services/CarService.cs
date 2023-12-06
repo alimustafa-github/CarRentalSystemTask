@@ -13,110 +13,78 @@ public class CarService : ICarService
 		_mapper = mapper;
 	}
 
+	public async Task<IEnumerable<CarDto>> GetCarsFromCacheAsync(int pageNumber, int pageSize)
+	{
+		IEnumerable<Car> cars = await _carRepository.GetFromCacheAsync(pageNumber, pageSize);
+		IEnumerable<CarDto> carDtos = _mapper.Map<IEnumerable<CarDto>>(cars);
+		if (carDtos is null)
+		{
+			throw new ArgumentNullException("Mapping Failed");
+		}
+		return carDtos;
+
+	}
 	public async Task<IEnumerable<CarDto>> GetCarsAsync(int pageNumber, int pageSize)
 	{
-		try
+		IEnumerable<Car> cars = await _carRepository.GetAllAsync(pageNumber, pageSize);
+		IEnumerable<CarDto> carDtos = _mapper.Map<IEnumerable<CarDto>>(cars);
+		if (carDtos is null)
 		{
-			IEnumerable<Car> cars = await _carRepository.GetFromCacheAsync(pageNumber, pageSize);
-			if (cars is null)
-			{
-				throw new ArgumentNullException(nameof(cars));
-			}
-			return _mapper.Map<IEnumerable<CarDto>>(cars);
+			throw new ArgumentNullException("Mapping Failed");
 		}
-		catch (ArgumentNullException ex)
-		{
-			throw;
-		}
-		catch (DbUpdateException ex)
-		{
-			throw;
-		}
-		catch (Exception ex)
-		{
-			throw;
-		}
+		return carDtos;
 	}
 
 	public async Task<CarDto> GetCarByIdAsync(Guid id)
 	{
-		try
+		Car car = await _carRepository.GetByIdAsync(id);
+		CarDto carDto = _mapper.Map<CarDto>(car);
+		if (carDto is null)
 		{
-			Car car = await _carRepository.GetByIdAsync(id);
-			if (car is null)
-			{
-				throw new ArgumentNullException(nameof(car));
-			}
-			return _mapper.Map<CarDto>(car);
+			throw new ArgumentNullException("Mapping Failed");
 		}
-		catch (ArgumentNullException ex)
-		{
-			throw;
-		}
-		catch (Exception ex)
-		{
-			throw;
-		}
+		return carDto;
 	}
 
 	public async Task<CarDto> AddCarAsync(AddCarDto addCarDto)
 	{
-		try
+		if (addCarDto is null)
 		{
-			if (addCarDto is null)
-			{
-				throw new ArgumentNullException();
-			}
+			throw new ArgumentNullException("the addCarDto is required");
+		}
 
-			Car car = _mapper.Map<Car>(addCarDto);
-			car = await _carRepository.AddAsync(car);
-			CarDto carDto = _mapper.Map<CarDto>(car);
-			return carDto;
-		}
-		catch (ArgumentNullException ex)
+		Car car = _mapper.Map<Car>(addCarDto);
+		car = await _carRepository.AddAsync(car);
+		CarDto carDto = _mapper.Map<CarDto>(car);
+		if (carDto is null)
 		{
-			throw;
+			throw new ArgumentNullException("The car was successfully created but there was an error while mapping");
 		}
-		catch (Exception)
-		{
-			throw;
-		}
+		return carDto;
 	}
 
 	public async Task<CarDto> UpdateCarAsync(object carId, UpdateCarDto updateCarDto)
 	{
-		if (updateCarDto is not null && carId is not null)
+		Car car = await _carRepository.GetByIdAsync(carId);
+		car = _mapper.Map(updateCarDto, car);
+		car = await _carRepository.UpdateAsync(car);
+		CarDto carDto = _mapper.Map<CarDto>(car);
+		if (carDto is null)
 		{
-
-			Car car = await _carRepository.GetByIdAsync(carId);
-			if (car is not null)
-			{
-				//car = _mapper.Map<Car>(updateCarDto);
-				car = _mapper.Map(updateCarDto, car);
-				await _carRepository.UpdateAsync(car);
-				return _mapper.Map<CarDto>(car);
-			}
-			else
-			{
-				throw new InvalidOperationException();
-			}
-
+			throw new ArgumentNullException("The car was successfully updated but there was an error while mapping");
 		}
-		else
-		{
-			return null;
-		}
+		return carDto;
 	}
 
 	public async Task<CarDto> DeleteCarAsync(object id)
 	{
 		Car car = await _carRepository.DeleteAsync(id);
-		if (car is not null)
+		CarDto carDto = _mapper.Map<CarDto>(car);
+		if (carDto is null)
 		{
-			CarDto carDto = _mapper.Map<CarDto>(car);
-			return carDto;
+			throw new ArgumentNullException("The car was successfully deleted but there was an error while mapping");
 		}
-		return null;
+		return carDto;
 	}
 
 	public async Task<CarDto> SearchForCarBySerialNumberAsync(int serialNumber)
@@ -138,10 +106,11 @@ public class CarService : ICarService
 
 	public async Task<IEnumerable<CarDto>> FilterTheCarsBySerialNumber(string value)
 	{
-		//todo : handle the errors if any 
 		string propertyName = "SerialNumber";
 		IEnumerable<Car> cars = await _carRepository.FilterTheRecords(propertyName, value);
 		IEnumerable<CarDto> carDtos = _mapper.Map<IEnumerable<CarDto>>(cars);
 		return carDtos;
 	}
+
+
 }

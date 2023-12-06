@@ -20,53 +20,93 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 
 	public async Task<TEntity> DeleteAsync(object id)
 	{
-		if (id is null)
+		try
 		{
-			throw new ArgumentNullException("The Identifier must not be null");
+			if (id is null)
+			{
+				throw new ArgumentNullException("The Identifier must not be null");
+			}
+			var entity = await GetByIdAsync(id);
+			if (!_context.Set<TEntity>().Local.Contains(entity))
+			{
+				throw new InvalidOperationException("Entity is not being tracked by the context.");
+			}
+			_context.Set<TEntity>().Remove(entity);
+			await _context.SaveChangesAsync();
+
+			return entity;
+
 		}
-		var entity = await _context.Set<TEntity>().FindAsync(id);
-		if (entity is null)
+		catch (DbUpdateException ex)
 		{
-			throw new ArgumentNullException("There is no Entity Corresponds with the given Identifier");
+			throw;
 		}
-
-		_context.Set<TEntity>().Remove(entity);
-		await _context.SaveChangesAsync();
-
-		return entity;
+		catch (Exception ex)
+		{
+			throw;
+		}
 	}
 
 	public async Task<TEntity> GetByIdAsync(object id)
 	{
-		return await _context.Set<TEntity>().FindAsync(id);
+		TEntity? entity = await _context.Set<TEntity>().FindAsync(id);
+		if (entity is null)
+		{
+			throw new ArgumentNullException("There is no Entity Corresponds with the give identifier");
+		}
+		return entity;
 	}
 
 	public async Task<IEnumerable<TEntity>> GetAllAsync(int pageNumber, int pageSize)
 	{
 		int recordsToSkip = (pageNumber - 1) * pageSize;
 
-		return await _context.Set<TEntity>().AsNoTracking().Skip(recordsToSkip).Take(pageSize).ToListAsync();
+		IEnumerable<TEntity> entities = await _context.Set<TEntity>().AsNoTracking().Skip(recordsToSkip).Take(pageSize).ToListAsync();
+		if (entities is null)
+		{
+			throw new ArgumentNullException("no data has being retrieved");
+		}
+		return entities;
 	}
+
+	public async Task<IEnumerable<TEntity>> GetFromCacheAsync(int pageNumber, int pageSize)
+	{
+		try
+		{
+			IEnumerable<TEntity> entities = _memoryCache.Get<IEnumerable<TEntity>>(pageNumber.ToString());
+
+			if (entities is null)
+			{
+				entities = await GetAllAsync(pageNumber, pageSize);
+				//the data will stay in Cache for two minutes
+				_memoryCache.Set(pageNumber.ToString(), entities, TimeSpan.FromMinutes(2));
+			}
+			return entities;
+		}
+		catch (InvalidCastException ex)
+		{
+			throw;
+		}
+	}
+
+
+
 
 	public async Task<TEntity> UpdateAsync(TEntity entity)
 	{
+		if (entity is null)
+		{
+			throw new ArgumentNullException("Please double check that you have entered a valid identifier");
+		}
+		if (!_context.Set<TEntity>().Local.Contains(entity))
+		{
+			throw new InvalidOperationException("Entity is not being tracked by the context.");
+		}
 		_context.Entry(entity).State = EntityState.Modified;
 		await _context.SaveChangesAsync();
 		return entity;
 	}
 
-	public async Task<IEnumerable<TEntity>> GetFromCacheAsync(int pageNumber, int pageSize)
-	{
-		IEnumerable<TEntity> entities = _memoryCache.Get<IEnumerable<TEntity>>("caching");
-
-		if (entities is null)
-		{
-			entities = await GetAllAsync(pageNumber, pageSize);
-			//the data will stay in Cache for two minutes
-			_memoryCache.Set("caching", entities, TimeSpan.FromMinutes(2));
-		}
-		return entities;
-	}
 
 
 	/// <summary>
@@ -76,6 +116,10 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 	/// <returns></returns>
 	public async Task<IEnumerable<TEntity>> SortAsync(Func<TEntity, IComparable> propertySelector, int pageNumber, int pageSize)
 	{
+		if (propertySelector is null)
+		{
+			throw new ArgumentNullException("Please provide the property you to to sort based on");
+		}
 		int recordsToSkip = (pageNumber - 1) * pageSize;
 		IEnumerable<TEntity> values = _context.Set<TEntity>().AsQueryable().OrderBy(propertySelector).Skip(recordsToSkip).Take(pageSize);
 		return values;
@@ -103,7 +147,7 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 	/// <param name="propertyName"></param>
 	/// <param name="value"></param>
 	/// <returns></returns>
-	public async Task<IEnumerable<TEntity>> FilterTheRecords(string propertyName, string value	)
+	public async Task<IEnumerable<TEntity>> FilterTheRecords(string propertyName, string value)
 	{
 		// Get the property info for the specified property name
 		var propertyInfo = typeof(TEntity).GetProperty(propertyName);

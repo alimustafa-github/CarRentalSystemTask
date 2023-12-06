@@ -1,4 +1,6 @@
-﻿namespace CarRental.Api.Controllers;
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace CarRental.Api.Controllers;
 [Route("api/car")]
 [ApiController]
 public class CarController : ControllerBase
@@ -10,75 +12,73 @@ public class CarController : ControllerBase
 		_carService = carService;
 	}
 
-	[HttpGet("getcars/{pagenumber}/{pagesize}")]
-	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCars(int pagenumber, int pagesize = 15)
+	[HttpGet("getcarsfromcache/{pagenumber}/{pagesize}")]
+	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCarsFromCache(int pagenumber, int pagesize = 15)
 	{
-		try
-		{
-			IEnumerable<CarDto> carDtos = await _carService.GetCarsAsync(pagenumber, pagesize);
+		IEnumerable<CarDto> carDtos = await _carService.GetCarsFromCacheAsync(pagenumber, pagesize);
 
-			if (carDtos != null)
-			{
-				return new ApiResponse<IEnumerable<CarDto>>
-				{
-					IsSuccess = true,
-					Data = carDtos,
-					Message = string.Empty
-				};
-			}
-			else
-			{
-				return new ApiResponse<IEnumerable<CarDto>>
-				{
-					IsSuccess = true,
-					Data = null,
-					Message = "We do not have any cars",
-				};
-			}
-		}
-		catch (Exception ex)
+		if (carDtos != null)
 		{
 			return new ApiResponse<IEnumerable<CarDto>>
 			{
-				IsSuccess = false,
-				Data = Enumerable.Empty<CarDto>(),
-				Message = ex.Message
+				StatusCode = StatusCodes.Status200OK,
+				IsSuccess = true,
+				Data = carDtos,
+				Message = string.Empty
 			};
 		}
+		else
+		{
+			throw new ArgumentNullException("no data has being retrieved");
+		}
 	}
+
+
+	[HttpGet("getcars/{pagenumber}/{pagesize}")]
+	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCarsFrom(int pagenumber, int pagesize = 15)
+	{
+		IEnumerable<CarDto> carDtos = await _carService.GetCarsAsync(pagenumber, pagesize);
+
+		if (carDtos != null)
+		{
+			return new ApiResponse<IEnumerable<CarDto>>
+			{
+				StatusCode = StatusCodes.Status200OK,
+				IsSuccess = true,
+				Data = carDtos,
+				Message = string.Empty
+			};
+		}
+		else
+		{
+			throw new ArgumentNullException("no data has being retrieved");
+		}
+	}
+
+
 
 	[HttpGet("searchcarbyid/{id}")]
 	public async Task<ApiResponse<CarDto>> GetCarById(Guid id)
 	{
-		try
+		CarDto carDto = await _carService.GetCarByIdAsync(id);
+		if (carDto != null)
 		{
-			CarDto carDto = await _carService.GetCarByIdAsync(id);
-			if (carDto != null)
+			return new ApiResponse<CarDto>
 			{
-				return new ApiResponse<CarDto>
-				{
-					IsSuccess = true,
-					Data = carDto
-				};
-			}
-			else
-			{
-				return new ApiResponse<CarDto>()
-				{
-					IsSuccess = false,
-					Data = null,
-					Message = "you have entered an invalid identifier"
-				};
-			}
-
+				IsSuccess = true,
+				Message = "Car Retrieved Successfully",
+				StatusCode = StatusCodes.Status200OK,
+				Data = carDto
+			};
 		}
-		catch (Exception ex)
+		else
 		{
 			return new ApiResponse<CarDto>()
 			{
 				IsSuccess = false,
+				StatusCode = StatusCodes.Status404NotFound,
 				Data = null,
-				Message = ex.Message
+				Message = "There is no car corresponds with the given identifier"
 			};
 		}
 	}
@@ -96,6 +96,7 @@ public class CarController : ControllerBase
 				{
 					IsSuccess = true,
 					Data = carDto,
+					StatusCode = StatusCodes.Status201Created
 					Message = "Car Added Successfully"
 				};
 			}
@@ -105,6 +106,7 @@ public class CarController : ControllerBase
 				{
 					IsSuccess = false,
 					Data = null,
+					StatusCode = StatusCodes.Status400BadRequest
 					Message = "Could not Add the Car"
 				};
 			}
@@ -125,36 +127,25 @@ public class CarController : ControllerBase
 	[HttpPut("updatecar/{id}")]
 	public async Task<ApiResponse<CarDto>> UpdateCar(Guid id, [FromBody] UpdateCarDto updateCarDto)
 	{
-
-		try
+		if (!string.IsNullOrWhiteSpace(id.ToString()))
 		{
-			if (updateCarDto is not null && !string.IsNullOrWhiteSpace(id.ToString()))
+			CarDto carDto = await _carService.UpdateCarAsync(id, updateCarDto);
+			return new ApiResponse<CarDto>
 			{
-				CarDto carDto = await _carService.UpdateCarAsync(id, updateCarDto);
-				return new ApiResponse<CarDto>
-				{
-					IsSuccess = true,
-					Data = carDto,
-					Message = "Car Updated Successfully"
-				};
-			}
-			else
-			{
-				return new ApiResponse<CarDto>
-				{
-					IsSuccess = false,
-					Data = null,
-					Message = "Could not update the car"
-				};
-			}
+				IsSuccess = true,
+				Data = carDto,
+				StatusCode = StatusCodes.Status200OK,
+				Message = "Car Updated Successfully"
+			};
 		}
-		catch (Exception ex)
+		else
 		{
 			return new ApiResponse<CarDto>
 			{
 				IsSuccess = false,
 				Data = null,
-				Message = ex.Message
+				StatusCode = StatusCodes.Status400BadRequest,
+				Message = "Could not update the car"
 			};
 		}
 	}
@@ -175,6 +166,7 @@ public class CarController : ControllerBase
 					{
 						IsSuccess = true,
 						Data = carDto,
+						StatusCode = StatusCodes.Status204NoContent,
 						Message = "Car Deleted Successfully"
 					};
 				}
@@ -215,40 +207,15 @@ public class CarController : ControllerBase
 	[HttpGet("sortcarsbyserialnumber/{pagenumber}/{pagesize}")]
 	public async Task<ApiResponse<IEnumerable<CarDto>>> SortTheCarsBySerialNumber(int pagenumber, int pagesize = 15)
 	{
-		try
+		IEnumerable<CarDto> carDtos = await _carService.SortCarsBySerialNumber(pagenumber, pagesize);
+
+		return new ApiResponse<IEnumerable<CarDto>>
 		{
-			IEnumerable<CarDto> carDtos = await _carService.SortCarsBySerialNumber(pagenumber, pagesize);
-			if (carDtos != null)
-			{
-
-				return new ApiResponse<IEnumerable<CarDto>>
-				{
-					IsSuccess = true,
-					Data = carDtos,
-					Message = string.Empty
-				};
-			}
-			else
-			{
-
-				return new ApiResponse<IEnumerable<CarDto>>
-				{
-					IsSuccess = false,
-					Data = null,
-					Message = "We do not have any cars in out system"
-				};
-			}
-		}
-		catch (Exception ex)
-		{
-
-			return new ApiResponse<IEnumerable<CarDto>>
-			{
-				IsSuccess = false,
-				Data = Enumerable.Empty<CarDto>(),
-				Message = ex.Message
-			};
-		}
+			IsSuccess = true,
+			Data = carDtos,
+			StatusCode = StatusCodes.Status200OK,
+			Message = string.Empty
+		};
 	}
 
 
@@ -256,38 +223,24 @@ public class CarController : ControllerBase
 	[HttpGet("searchbyserialnumber/{number}")]
 	public async Task<ApiResponse<CarDto>> SearchBySerialNumber(int number)
 	{
-		try
-		{
-			CarDto carDto = await _carService.SearchForCarBySerialNumberAsync(number);
-
-			if (carDto is not null)
-			{
-				return new ApiResponse<CarDto>
-				{
-					IsSuccess = true,
-					Data = carDto,
-					Message = string.Empty
-				};
-			}
-			else
-			{
-				return new ApiResponse<CarDto>
-				{
-					IsSuccess = false,
-					Data = null,
-					Message = "Could not find the car"
-				};
-			}
-		}
-		catch (Exception ex)
+		CarDto carDto = await _carService.SearchForCarBySerialNumberAsync(number);
+		if (carDto is null)
 		{
 			return new ApiResponse<CarDto>
 			{
 				IsSuccess = false,
 				Data = null,
-				Message = ex.Message
+				StatusCode = StatusCodes.Status404NotFound,
+				Message = "No car has been found"
 			};
 		}
+		return new ApiResponse<CarDto>
+		{
+			IsSuccess = true,
+			Data = carDto,
+			StatusCode = StatusCodes.Status200OK,
+			Message = string.Empty
+		};
 	}
 
 
@@ -296,38 +249,26 @@ public class CarController : ControllerBase
 	[HttpGet("filtercarsbyserialnumber/{number}")]
 	public async Task<ApiResponse<IEnumerable<CarDto>>> FilterTheCars(string number)
 	{
-		try
-		{
-			IEnumerable<CarDto> carDtos = await _carService.FilterTheCarsBySerialNumber(number);
+		IEnumerable<CarDto> carDtos = await _carService.FilterTheCarsBySerialNumber(number);
 
-			if (carDtos is not null)
-			{
-				return new ApiResponse<IEnumerable<CarDto>>
-				{
-					IsSuccess = true,
-					Data = carDtos,
-					Message = string.Empty
-				};
-			}
-			else
-			{
-				return new ApiResponse<IEnumerable<CarDto>>
-				{
-					IsSuccess = false,
-					Data = null,
-					Message = "Could not find the car"
-				};
-			}
-		}
-		catch (Exception ex)
+		if (carDtos is not null && carDtos.ToList().Count > 0)
 		{
 			return new ApiResponse<IEnumerable<CarDto>>
 			{
-				IsSuccess = false,
-				Data = null,
-				Message = ex.Message
+				IsSuccess = true,
+				Data = carDtos,
+				Message = string.Empty
 			};
 		}
+
+		return new ApiResponse<IEnumerable<CarDto>>
+		{
+			IsSuccess = false,
+			Data = Enumerable.Empty<CarDto>(),
+			StatusCode = StatusCodes.Status404NotFound,
+			Message = "No car has been found"
+		};
+
 	}
 
 
