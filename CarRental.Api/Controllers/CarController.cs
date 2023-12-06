@@ -16,21 +16,13 @@ public class CarController : ControllerBase
 	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCarsFromCache(int pagenumber, int pagesize = 15)
 	{
 		IEnumerable<CarDto> carDtos = await _carService.GetCarsFromCacheAsync(pagenumber, pagesize);
-
-		if (carDtos != null)
+		return new ApiResponse<IEnumerable<CarDto>>
 		{
-			return new ApiResponse<IEnumerable<CarDto>>
-			{
-				StatusCode = StatusCodes.Status200OK,
-				IsSuccess = true,
-				Data = carDtos,
-				Message = string.Empty
-			};
-		}
-		else
-		{
-			throw new ArgumentNullException("no data has being retrieved");
-		}
+			StatusCode = StatusCodes.Status200OK,
+			IsSuccess = true,
+			Data = carDtos,
+			Message = string.Empty
+		};
 	}
 
 
@@ -39,20 +31,13 @@ public class CarController : ControllerBase
 	{
 		IEnumerable<CarDto> carDtos = await _carService.GetCarsAsync(pagenumber, pagesize);
 
-		if (carDtos != null)
+		return new ApiResponse<IEnumerable<CarDto>>
 		{
-			return new ApiResponse<IEnumerable<CarDto>>
-			{
-				StatusCode = StatusCodes.Status200OK,
-				IsSuccess = true,
-				Data = carDtos,
-				Message = string.Empty
-			};
-		}
-		else
-		{
-			throw new ArgumentNullException("no data has being retrieved");
-		}
+			StatusCode = StatusCodes.Status200OK,
+			IsSuccess = true,
+			Data = carDtos,
+			Message = string.Empty
+		};
 	}
 
 
@@ -61,26 +46,13 @@ public class CarController : ControllerBase
 	public async Task<ApiResponse<CarDto>> GetCarById(Guid id)
 	{
 		CarDto carDto = await _carService.GetCarByIdAsync(id);
-		if (carDto != null)
+		return new ApiResponse<CarDto>
 		{
-			return new ApiResponse<CarDto>
-			{
-				IsSuccess = true,
-				Message = "Car Retrieved Successfully",
-				StatusCode = StatusCodes.Status200OK,
-				Data = carDto
-			};
-		}
-		else
-		{
-			return new ApiResponse<CarDto>()
-			{
-				IsSuccess = false,
-				StatusCode = StatusCodes.Status404NotFound,
-				Data = null,
-				Message = "There is no car corresponds with the given identifier"
-			};
-		}
+			IsSuccess = true,
+			Message = "Car Retrieved Successfully",
+			StatusCode = StatusCodes.Status200OK,
+			Data = carDto
+		};
 	}
 
 	[HttpPost("addcar")]
