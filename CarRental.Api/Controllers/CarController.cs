@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace CarRental.Api.Controllers;
+﻿namespace CarRental.Api.Controllers;
 [Route("api/car")]
 [ApiController]
 public class CarController : ControllerBase

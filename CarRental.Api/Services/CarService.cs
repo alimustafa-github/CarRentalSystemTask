@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace CarRental.Api.Services;
+﻿namespace CarRental.Api.Services;
 
 public class CarService : ICarService
 {
