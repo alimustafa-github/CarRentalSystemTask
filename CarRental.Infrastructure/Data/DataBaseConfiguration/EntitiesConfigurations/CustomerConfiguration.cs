@@ -26,9 +26,7 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
 		builder.Property(c => c.JoinDate).IsRequired().HasDefaultValue(DateTime.Now);
 
-		builder.Property(c => c.EmergencyContactName).IsRequired(false);
 
-		builder.Property(c => c.EmergencyContactNumber).IsRequired(false);
 
 		builder.Property(c => c.MembershipId).IsRequired();
 		builder.HasOne(c => c.MembershipLevel)

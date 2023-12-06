@@ -8,7 +8,7 @@ public static class ConfigureAppSerivces
 		builder.Services.AddTransient<ICarService, CarService>();
 		builder.Services.AddTransient<IDriverService, DriverService>();
 		builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
-		builder.Services.AddScoped<IAuthService, AuthService>();
+		builder.Services.AddScoped<IUserService, UserService>();
 		builder.Services.AddTransient<EfCoreCarRepository>();
 		builder.Services.AddTransient<EfCoreDriverRepository>();
 

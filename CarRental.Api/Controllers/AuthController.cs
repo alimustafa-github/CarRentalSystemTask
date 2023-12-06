@@ -3,9 +3,9 @@
 [ApiController]
 public class AuthController : ControllerBase
 {
-	private readonly IAuthService _authService;
+	private readonly IUserService _authService;
 
-	public AuthController(IAuthService authService)
+	public AuthController(IUserService authService)
 	{
 		_authService = authService;
 	}
@@ -20,6 +20,7 @@ public class AuthController : ControllerBase
 			{
 				IsSuccess = false,
 				Data = "",
+				StatusCode = StatusCodes.Status400BadRequest,
 				Message = errorMessage
 			};
 		}
@@ -27,6 +28,7 @@ public class AuthController : ControllerBase
 		{
 			IsSuccess = true,
 			Data = "",
+			StatusCode = StatusCodes.Status202Accepted,
 			Message = "You have successfully registered"
 		};
 	}
@@ -43,6 +45,7 @@ public class AuthController : ControllerBase
 			{
 				IsSuccess = false,
 				Data = "",
+				StatusCode = StatusCodes.Status400BadRequest,
 				Message = "incorrect email or password"
 			};
 		}
@@ -50,85 +53,124 @@ public class AuthController : ControllerBase
 		{
 			IsSuccess = true,
 			Data = loginResponse,
+			StatusCode = StatusCodes.Status202Accepted,
 			Message = "You have successfully authenticated"
 		};
 	}
 
-
-
-	[HttpPost("assignrole/{email}/{role}")]
-	public async Task<ApiResponse<bool>> AssignRole(string email, string role)
+	[HttpPut("updateuser/{id}")]
+	public async Task<ApiResponse<ApplicationUserDto>> UpdateUser(string id, [FromBody] UpdateUserDto updateUserDto)
 	{
-		bool result = await _authService.AssignRoleAsync(email, role);
-		if (result)
+		ApplicationUserDto userDto = await _authService.UpdateUserAsync(id, updateUserDto);
+		if (userDto is not null)
 		{
-			return new ApiResponse<bool>
+			return new ApiResponse<ApplicationUserDto>()
 			{
 				IsSuccess = true,
-				Message = "Role Assigned Successfully"
+				Data = userDto,
+				StatusCode = StatusCodes.Status200OK,
+				Message = string.Empty
 			};
 		}
 		else
 		{
-			return new ApiResponse<bool>
+			//todo : get back and fix this issue
+			return new ApiResponse<ApplicationUserDto>()
 			{
 				IsSuccess = false,
-				Message = "Could not assign role , Please check that the email or the role name is correct"
+				Data = null,
+				StatusCode = StatusCodes.Status400BadRequest,
+				Message = "Failed to update"
 			};
 		}
-
 	}
-	//[Authorize(Roles = nameof(AppRoles.Admin))]
-	//[HttpPost("removerole/{email}/{role}")]
-	//public async Task<ApiResponse<bool>> RemoveRole(string email, string role)
-	//{
-	//	bool result = await _authService.RemoveRoleAsync(email, role);
-	//	if (result)
-	//	{
-	//		return new ApiResponse<bool>
-	//		{
-	//			IsSuccess = true,
-	//			Message = "Role Removed Successfully"
-	//		};
-	//	}
-	//	else
-	//	{
-	//		return new ApiResponse<bool>
-	//		{
-	//			IsSuccess = false,
-	//			Message = "Could not remove role , Please check that the email or the role name is correct"
-	//		};
-	//	}
-
-	//}
 
 
 
-	//[HttpPost("addrole")]
-	//public async Task<ApiResponse<RoleDto>> AddRole([FromBody] RoleDto roleDto)
-	//{
-	//	RoleDto result = await _authService.AddRoleAsync(roleDto);
-	//	if (result is not null)
-	//	{
-	//		return new ApiResponse<RoleDto>
-	//		{
-	//			IsSuccess = true,
-	//			Data = roleDto,
-	//			Message = "Role Created Successfully"
-	//		};
-	//	}
-	//	else
-	//	{
-	//		return new ApiResponse<RoleDto>
-	//		{
-	//			IsSuccess = false,
-	//			Data = null,
-	//			Message = "Could not Create role "
-	//		};
-	//	}
+	[HttpDelete("deleteuser/{id}")]
+	public async Task<ApiResponse<ApplicationUserDto>> DeleteUser(string id)
+	{
+		ApplicationUserDto userDto = await _authService.DeleteUserAsync(id);
+		if (userDto is not null)
+		{
+			return new ApiResponse<ApplicationUserDto>()
+			{
+				IsSuccess = true,
+				Data = userDto,
+				StatusCode = StatusCodes.Status204NoContent,
+				Message = string.Empty
+			};
+		}
+		else
+		{
+			//todo : get back and fix this issue
+			return new ApiResponse<ApplicationUserDto>()
+			{
+				IsSuccess = false,
+				Data = null,
+				StatusCode = StatusCodes.Status400BadRequest,
+				Message = "Failed to update"
+			};
+		}
+	}
 
-	//}
 
+
+	[HttpGet("getuser/{id}")]
+	public async Task<ApiResponse<ApplicationUserDto>> GetUserById(string id)
+	{
+		ApplicationUserDto userDto = await _authService.GetUserByIdAsync(id);
+		if (userDto is not null)
+		{
+			return new ApiResponse<ApplicationUserDto>()
+			{
+				IsSuccess = true,
+				Data = userDto,
+				StatusCode = StatusCodes.Status200OK,
+				Message = string.Empty
+			};
+		}
+		else
+		{
+			//todo : get back and fix this issue
+			return new ApiResponse<ApplicationUserDto>()
+			{
+				IsSuccess = false,
+				Data = null,
+				StatusCode = StatusCodes.Status404NotFound,
+				Message = "There is no User mathches with the given identifier"
+			};
+		}
+	}
+
+
+
+	[HttpGet("getalluser")]
+	public async Task<ApiResponse<IEnumerable<ApplicationUserDto>>> GetAllUSers(string id)
+	{
+		IEnumerable<ApplicationUserDto> userDto = await _authService.GetAllUsersAsync();
+		if (userDto is not null)
+		{
+			return new ApiResponse<IEnumerable<ApplicationUserDto>>()
+			{
+				IsSuccess = true,
+				Data = userDto,
+				StatusCode = StatusCodes.Status200OK,
+				Message = string.Empty
+			};
+		}
+		else
+		{
+			//todo : get back and fix this issue
+			return new ApiResponse<IEnumerable<ApplicationUserDto>>()
+			{
+				IsSuccess = false,
+				Data = null,
+				StatusCode = StatusCodes.Status404NotFound,
+				Message = string.Empty
+			};
+		}
+	}
 
 
 }

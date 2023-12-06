@@ -5,8 +5,7 @@ public class DriverService : IDriverService
 	private readonly EfCoreDriverRepository _driverRepository;
 	private readonly IMapper _mapper;
 
-	public event EventHandler<RegistrationRequestDto> OnDriverRegistration;
-
+	
 	public DriverService(EfCoreDriverRepository driverRepository, IMapper mapper)
 	{
 		_driverRepository = driverRepository;
@@ -15,13 +14,11 @@ public class DriverService : IDriverService
 
 	public async Task<DriverDto> AddDriverAsync(AddDriverDto addDriverDto)
 	{
-		//todo : this is not right to register the user here create an event and notify the Responsilbe Service to create a new user.
 		Driver driver = _mapper.Map<Driver>(addDriverDto);
 		if (driver is null || driver.User is null)
 		{
 			throw new ArgumentNullException("Please Check that the Inputs are correct");
 		}
-		//await _userManager.CreateAsync(driver.User);
 		driver.UserId = driver.User.Id;
 		await _driverRepository.AddAsync(driver);
 		DriverDto driverDto = _mapper.Map<DriverDto>(driver);

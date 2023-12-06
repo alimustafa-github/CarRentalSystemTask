@@ -1,13 +1,13 @@
 ﻿namespace CarRental.Api.Services;
 
-public class AuthService : IAuthService
+public class UserService : IUserService
 {
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly RoleManager<IdentityRole> _roleManager;
 	private readonly IJwtTokenGenerator _jwtTokenGenerator;
 	private readonly IMapper _mapper;
 
-	public AuthService(IMapper mapper, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IJwtTokenGenerator jwtTokenGenerator)
+	public UserService(IMapper mapper, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IJwtTokenGenerator jwtTokenGenerator)
 	{
 		_userManager = userManager;
 		_roleManager = roleManager;
@@ -71,5 +71,71 @@ public class AuthService : IAuthService
 			return true;
 		}
 		return false;
+	}
+
+	public async Task<ApplicationUserDto> UpdateUserAsync(string id, UpdateUserDto updateUserDto)
+	{
+		ApplicationUser user = await _userManager.FindByIdAsync(id);
+		var result = await _userManager.UpdateAsync(user);
+		ApplicationUserDto userDto = _mapper.Map<ApplicationUserDto>(user);
+		if (result.Succeeded)
+		{
+			return userDto;
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+
+	public async Task<ApplicationUserDto> DeleteUserAsync(string id)
+	{
+		ApplicationUser user = await _userManager.FindByIdAsync(id);
+		var result = await _userManager.DeleteAsync(user);
+		ApplicationUserDto userDto = _mapper.Map<ApplicationUserDto>(user);
+		if (result.Succeeded)
+		{
+			return userDto;
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+
+	public async Task<IEnumerable<ApplicationUserDto>> GetAllUsersAsync()
+	{
+		IEnumerable<ApplicationUser> users = await _userManager.Users.ToListAsync();
+		if (users is null)
+		{
+			throw new ArgumentNullException();
+		}
+		else
+		{
+			IEnumerable<ApplicationUserDto> userDtos = _mapper.Map<IEnumerable<ApplicationUserDto>>(users);
+
+			return userDtos;
+		}
+
+	}
+
+	public async Task<ApplicationUserDto> GetUserByEmailAsync(string email)
+	{
+		ApplicationUser user = await _userManager.FindByEmailAsync(email);
+		if (user is null)
+		{
+			throw new ArgumentNullException("Invalid Email");
+		}
+		ApplicationUserDto userDto = _mapper.Map<ApplicationUserDto>(user);
+		return userDto;
+	}
+
+	public async Task<ApplicationUserDto> GetUserByIdAsync(string id)
+	{
+		ApplicationUser user = await _userManager.FindByIdAsync(id);
+		ApplicationUserDto userDto = _mapper.Map<ApplicationUserDto>(user);
+		return userDto;
 	}
 }
