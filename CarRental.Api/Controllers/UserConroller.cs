@@ -1,11 +1,11 @@
 ﻿namespace CarRental.Api.Controllers;
-[Route("api/authentication")]
+[Route("api/user")]
 [ApiController]
-public class AuthController : ControllerBase
+public class UserConroller : ControllerBase
 {
 	private readonly IUserService _authService;
 
-	public AuthController(IUserService authService)
+	public UserConroller(IUserService authService)
 	{
 		_authService = authService;
 	}
@@ -36,9 +36,9 @@ public class AuthController : ControllerBase
 
 
 	[HttpPost("login")]
-	public async Task<ApiResponse<string>> Login([FromBody] LoginRequestDto model)
+	public async Task<ApiResponse<string>> Login([FromBody] LoginRequestDto loginRequestDto)
 	{
-		var loginResponse = await _authService.LoginAsync(model);
+		var loginResponse = await _authService.LoginAsync(loginRequestDto);
 		if (string.IsNullOrEmpty(loginResponse))
 		{
 			return new ApiResponse<string>
@@ -145,8 +145,8 @@ public class AuthController : ControllerBase
 
 
 
-	[HttpGet("getalluser")]
-	public async Task<ApiResponse<IEnumerable<ApplicationUserDto>>> GetAllUSers(string id)
+	[HttpGet("getallusers")]
+	public async Task<ApiResponse<IEnumerable<ApplicationUserDto>>> GetAllUSers()
 	{
 		IEnumerable<ApplicationUserDto> userDto = await _authService.GetAllUsersAsync();
 		if (userDto is not null)
