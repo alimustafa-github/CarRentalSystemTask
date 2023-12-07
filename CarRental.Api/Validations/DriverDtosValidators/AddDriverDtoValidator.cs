@@ -8,7 +8,7 @@ public class AddDriverDtoValidator : AbstractValidator<AddDriverDto>
 
 		RuleFor(x => x.JoinDate)
 		   .Must(BeWithinOneMonth)
-		   .WithMessage("Date must be within one month from the current date.");
+		   .WithMessage("Join Date must be within one month from the current date.");
 
 		RuleFor(d => d.LicenceNumber).NotEmpty().Length(8).WithMessage("The LicenceNumber should exactly be 8 charachters longs")
 			.Must(licenceNumber => !licenceNumber.ToString().Contains(" ")).WithMessage("The LicenceNumber must not contain any spaces");

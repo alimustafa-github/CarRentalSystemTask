@@ -2,9 +2,9 @@
 
 public record UpdateRentedCarDto
 {
-	public DriverDto? Driver { get; set; }
-	public CarDto Car { get; set; }
-	public CustomerDto Customer { get; set; }
-	public DateTime ReservationStartDate { get; set; }
-	public DateTime ReservationEndDate { get; set; }
+	public Guid? DriverId { get; set; }
+	public Guid? CarId { get; set; }
+	public Guid? CustomerId { get; set; }
+	public DateTime? ReservationStartDate { get; set; }
+	public DateTime? ReservationEndDate { get; set; }
 }

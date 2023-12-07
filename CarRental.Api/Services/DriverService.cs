@@ -1,11 +1,13 @@
-﻿namespace CarRental.Api.Services;
+﻿using CarRental.Core.Entities;
+
+namespace CarRental.Api.Services;
 
 public class DriverService : IDriverService
 {
 	private readonly EfCoreDriverRepository _driverRepository;
 	private readonly IMapper _mapper;
 
-	
+
 	public DriverService(EfCoreDriverRepository driverRepository, IMapper mapper)
 	{
 		_driverRepository = driverRepository;
@@ -20,6 +22,8 @@ public class DriverService : IDriverService
 			throw new ArgumentNullException("Please Check that the Inputs are correct");
 		}
 		driver.UserId = driver.User.Id;
+		driver.User.IsDriver = true;
+
 		await _driverRepository.AddAsync(driver);
 		DriverDto driverDto = _mapper.Map<DriverDto>(driver);
 		if (driverDto is null)

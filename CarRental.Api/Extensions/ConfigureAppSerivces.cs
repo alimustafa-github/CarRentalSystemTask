@@ -9,9 +9,12 @@ public static class ConfigureAppSerivces
 		builder.Services.AddTransient<IDriverService, DriverService>();
 		builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 		builder.Services.AddScoped<IUserService, UserService>();
+		builder.Services.AddScoped<IRentedCarService, RentedCarService>();
+		builder.Services.AddScoped<ICustomerService, CustomerService>();
 		builder.Services.AddTransient<EfCoreCarRepository>();
 		builder.Services.AddTransient<EfCoreDriverRepository>();
-
+		builder.Services.AddTransient<EfCoreCustomerRepository>();
+		builder.Services.AddTransient<EfCoreRentedCarRepository>();
 
 
 		//Register the fluent Validation as a serivce
