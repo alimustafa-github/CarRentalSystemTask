@@ -83,7 +83,7 @@ public class RentedCarController : ControllerBase
 
 
 	[HttpDelete("deleterentedcarbyid/{id}")]
-	public async Task<ApiResponse<RentedCarDto>> DeleteRentedCar(object id)
+	public async Task<ApiResponse<RentedCarDto>> DeleteRentedCar(Guid id)
 	{
 		RentedCarDto rentedCarDto = await _rentedCarService.DeleteRentedCarByIdAsync(id);
 		return new ApiResponse<RentedCarDto>

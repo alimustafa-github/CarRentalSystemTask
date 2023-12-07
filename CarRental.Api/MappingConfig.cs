@@ -9,6 +9,8 @@ public class MappingConfig
 		{
 
 			config.CreateMap<UpdateCarDto, Car>().ReverseMap();
+			config.CreateMap<UpdateCarDto, CarDto>().ReverseMap();
+
 			config.CreateMap<Car, AddCarDto>().ReverseMap();
 			config.CreateMap<Car, CarDto>().ReverseMap();
 

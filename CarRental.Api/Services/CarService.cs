@@ -4,11 +4,17 @@ public class CarService : ICarService
 {
 	private readonly EfCoreCarRepository _carRepository;
 	private readonly IMapper _mapper;
+	private readonly IMediator _mediator;
+	private readonly IUserService _userService;
+	private readonly IDriverService _driverService;
 
-	public CarService(EfCoreCarRepository carRepository, IMapper mapper)
+	public CarService(EfCoreCarRepository carRepository, IMapper mapper, IMediator mediator, IUserService userService, IDriverService driverService)
 	{
 		_carRepository = carRepository;
 		_mapper = mapper;
+		_mediator = mediator;
+		_userService = userService;
+		_driverService = driverService;
 	}
 
 	public async Task<IEnumerable<CarDto>> GetCarsFromCacheAsync(int pageNumber, int pageSize)
@@ -25,7 +31,23 @@ public class CarService : ICarService
 	public async Task<IEnumerable<CarDto>> GetCarsAsync(int pageNumber, int pageSize)
 	{
 		IEnumerable<Car> cars = await _carRepository.GetAllAsync(pageNumber, pageSize);
-		IEnumerable<CarDto> carDtos = _mapper.Map<IEnumerable<CarDto>>(cars);
+		IEnumerable<ApplicationUserDto> userDtos = await _userService.GetAllUsersAsync();
+		IEnumerable<DriverDto> driverDtos = await _driverService.GetDriversAsync(pageNumber, pageSize);
+
+		IEnumerable<CarDto> carDtos = from car in cars
+									  join driver in driverDtos on car.DriverId equals driver.Id
+									  join user in userDtos on driver.UserId equals user.Id
+									  select new CarDto
+									  {
+										  Id = car.Id,
+										  DailyFaire = car.DailyFaire,
+										  DriverFullName = user.FirstName + " " + user.LastName,
+										  CarTypeId = car.CarTypeId,
+										  IsRented = car.IsRented,
+										  Color = car.Color,
+										  EngineCapacity = car.EngineCapacity,
+										  SerialNumber = car.SerialNumber
+									  };
 		if (carDtos is null)
 		{
 			throw new ArgumentNullException("Mapping Failed");

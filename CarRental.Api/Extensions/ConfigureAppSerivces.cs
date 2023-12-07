@@ -60,6 +60,8 @@ public static class ConfigureAppSerivces
 		builder.Services.AddSingleton(mapper);
 		builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+		builder.Services.AddMediatR(con => con.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
+
 		//For using In-Memory Caching
 		builder.Services.AddMemoryCache();
 
