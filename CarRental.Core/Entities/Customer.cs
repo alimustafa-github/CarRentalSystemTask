@@ -8,8 +8,6 @@ public class Customer : IEntityBase
 	public string? LicenseNumber { get; set; }
 	public DateTime? LicenseExpirationDate { get; set; }
 	public DateTime JoinDate { get; set; }
-	public string? EmergencyContactName { get; set; }
-	public string? EmergencyContactNumber { get; set; }
 	public Guid MembershipId { get; set; }
 	public Membership MembershipLevel { get; set; }
 	public ICollection<RentedCar> RentedCars { get; set; }

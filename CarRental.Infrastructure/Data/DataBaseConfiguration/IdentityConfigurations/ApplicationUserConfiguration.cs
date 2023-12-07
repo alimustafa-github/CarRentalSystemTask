@@ -13,5 +13,9 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 		builder.Property(u => u.DateOfBirth).IsRequired(false);
 
 		builder.Property(u => u.CurrentAddress).IsRequired(false);
+
+		builder.Property(u => u.EmergencyContactName).IsRequired(false);
+
+		builder.Property(u => u.EmergencyContactNumber).IsRequired(false);
 	}
 }

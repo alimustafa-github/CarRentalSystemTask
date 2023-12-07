@@ -8,4 +8,6 @@ public record UpdateUserDto
 	public string PhoneNumber { get; set; }
 	public DateTime DateOfBirth { get; set; }
 	public string CurrentAddress { get; set; }
+	public string? EmergencyContactName { get; set; }
+	public string? EmergencyContactNumber { get; set; }
 }

@@ -1,39 +1,30 @@
-﻿using CarRental.Api.Dtos.CarDtos;
-using CarRental.Api.Dtos.DriverDtos;
-using CarRental.Core.Entities;
-using Microsoft.Data.SqlClient;
-
-namespace CarRental.Api.Services;
+﻿namespace CarRental.Api.Services;
 
 public class DriverService : IDriverService
 {
-	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly EfCoreDriverRepository _driverRepository;
-	//public event EventHandler<ApplicationUser> DriverRegistrationEvent;
 	private readonly IMapper _mapper;
 
-	public DriverService(UserManager<ApplicationUser> userManager, EfCoreDriverRepository driverRepository, IMapper mapper)
+	
+	public DriverService(EfCoreDriverRepository driverRepository, IMapper mapper)
 	{
-		_userManager = userManager;
 		_driverRepository = driverRepository;
 		_mapper = mapper;
 	}
 
 	public async Task<DriverDto> AddDriverAsync(AddDriverDto addDriverDto)
 	{
-		//todo : this is not right to register the user here create an event and notify the Responsilbe Service to create a new user.
 		Driver driver = _mapper.Map<Driver>(addDriverDto);
 		if (driver is null || driver.User is null)
 		{
 			throw new ArgumentNullException("Please Check that the Inputs are correct");
 		}
-		await _userManager.CreateAsync(driver.User);
 		driver.UserId = driver.User.Id;
 		await _driverRepository.AddAsync(driver);
 		DriverDto driverDto = _mapper.Map<DriverDto>(driver);
 		if (driverDto is null)
 		{
-			throw new ArgumentNullException("The Driver was Successfully Added to the Database but there was error while mapping");
+			throw new ArgumentNullException("The Driver was Successfully Added but there was error while mapping");
 		}
 		return driverDto;
 
