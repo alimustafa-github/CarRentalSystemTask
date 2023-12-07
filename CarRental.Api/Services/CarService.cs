@@ -20,7 +20,23 @@ public class CarService : ICarService
 	public async Task<IEnumerable<CarDto>> GetCarsFromCacheAsync(int pageNumber, int pageSize)
 	{
 		IEnumerable<Car> cars = await _carRepository.GetFromCacheAsync(pageNumber, pageSize);
-		IEnumerable<CarDto> carDtos = _mapper.Map<IEnumerable<CarDto>>(cars);
+		IEnumerable<ApplicationUserDto> userDtos = await _userService.GetAllUsersAsync();
+		IEnumerable<DriverDto> driverDtos = await _driverService.GetDriversAsync(pageNumber, pageSize);
+
+		IEnumerable<CarDto> carDtos = from car in cars
+									  join driver in driverDtos on car.DriverId equals driver.Id
+									  join user in userDtos on driver.UserId equals user.Id
+									  select new CarDto
+									  {
+										  Id = car.Id,
+										  DailyFaire = car.DailyFaire,
+										  DriverFullName = user.FirstName + " " + user.LastName,
+										  CarTypeId = car.CarTypeId,
+										  IsRented = car.IsRented,
+										  Color = car.Color,
+										  EngineCapacity = car.EngineCapacity,
+										  SerialNumber = car.SerialNumber
+									  };
 		if (carDtos is null)
 		{
 			throw new ArgumentNullException("Mapping Failed");
