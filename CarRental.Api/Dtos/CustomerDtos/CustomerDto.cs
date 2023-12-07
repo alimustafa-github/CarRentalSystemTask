@@ -7,11 +7,9 @@ public record CustomerDto
 
 	public bool HasLicence { get; set; }
 	public string LicenseNumber { get; set; }
-	public DateTime? LicenseExpirationDate { get; set; }
+	public DateTime? LicenceExpirationDate { get; set; }
 	public DateTime JoinDate { get; set; }
-	public string? EmergencyContactName { get; set; }
-	public string? EmergencyContactNumber { get; set; }
-	public MembershipDto MembershipLevel { get; set; }
+	public Guid MembershipId { get; set; }
 	public int CurrentlyRentedCarsCount { get; set; }
 	public ICollection<RentedCarDto> RentedCars { get; set; }
 

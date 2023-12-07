@@ -4,6 +4,7 @@ public record CarDto
 {
 	public Guid Id { get; set; }
 	public int SerialNumber { get; set; }
+    public string DriverFullName { get; set; }
     public Guid CarTypeId { get; set; }
     public CarTypeDto Type { get; set; }
 	public decimal DailyFaire { get; set; }

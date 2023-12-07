@@ -2,12 +2,14 @@
 
 public class DriverService : IDriverService
 {
+	private readonly IUserService _userService;
 	private readonly EfCoreDriverRepository _driverRepository;
 	private readonly IMapper _mapper;
 
-	
-	public DriverService(EfCoreDriverRepository driverRepository, IMapper mapper)
+
+	public DriverService(IUserService userService,EfCoreDriverRepository driverRepository, IMapper mapper)
 	{
+		_userService = userService;
 		_driverRepository = driverRepository;
 		_mapper = mapper;
 	}
@@ -20,6 +22,8 @@ public class DriverService : IDriverService
 			throw new ArgumentNullException("Please Check that the Inputs are correct");
 		}
 		driver.UserId = driver.User.Id;
+		driver.User.IsDriver = true;
+
 		await _driverRepository.AddAsync(driver);
 		DriverDto driverDto = _mapper.Map<DriverDto>(driver);
 		if (driverDto is null)
@@ -56,6 +60,7 @@ public class DriverService : IDriverService
 	public async Task<IEnumerable<DriverDto>> GetDriversAsync(int pageNumber, int pageSize)
 	{
 		IEnumerable<Driver> drivers = await _driverRepository.GetAllAsync(pageNumber, pageSize);
+		IEnumerable<ApplicationUserDto> userDtos = await _userService.GetAllUsersAsync();
 		IEnumerable<DriverDto> driverDtos = _mapper.Map<IEnumerable<DriverDto>>(drivers);
 
 		if (driverDtos is null)
@@ -98,6 +103,7 @@ public class DriverService : IDriverService
 
 		return _mapper.Map<IEnumerable<DriverDto>>(drivers);
 	}
+
 
 
 }
