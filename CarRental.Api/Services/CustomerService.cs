@@ -1,6 +1,4 @@
-﻿using CarRental.Api.Dtos.DriverDtos;
-
-namespace CarRental.Api.Services;
+﻿namespace CarRental.Api.Services;
 
 public class CustomerService : ICustomerService
 {

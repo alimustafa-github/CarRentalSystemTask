@@ -1,6 +1,4 @@
-﻿using CarRental.Api.Dtos.RentedCarDtos;
-
-namespace CarRental.Api.Services;
+﻿namespace CarRental.Api.Services;
 
 public class RentedCarService : IRentedCarService
 {
@@ -19,8 +17,8 @@ public class RentedCarService : IRentedCarService
 
 	public async Task<RentedCarDto> AddRentedCarAsync(AddRentedCarDto addRentedCarDto)
 	{
-		var carIdIsExists = await SearchForRentedCarByCarIdAsync(addRentedCarDto.CarId.ToString());
-		var driverIdIsExists = await SearchForRentedCarByCarIdAsync(addRentedCarDto.DriverId.ToString());
+		var carIdIsExists = await SearchForRentedCarByCarIdAsync(addRentedCarDto.CarId);
+		var driverIdIsExists = await SearchForRentedCarByCarIdAsync(addRentedCarDto.DriverId);
 		if (carIdIsExists is not null)
 		{
 			throw new DbUpdateException("carID you have entered already exist");
@@ -34,7 +32,7 @@ public class RentedCarService : IRentedCarService
 
 		RentedCar rentedCar = _mapper.Map<RentedCar>(addRentedCarDto);
 		rentedCar = await _rentedCarRepository.AddAsync(rentedCar);
-		//_mediator.Publish(new CarRentedEvent { DriverId = rentedCar.Id, CarId = rentedCar.CarId });
+		_mediator.Publish(new CarRentedEvent { DriverId = rentedCar.Id, CarId = rentedCar.CarId, Cancellation = false });
 		RentedCarDto rentedCarDto = _mapper.Map<RentedCarDto>(rentedCar);
 		return rentedCarDto;
 	}
@@ -43,7 +41,7 @@ public class RentedCarService : IRentedCarService
 	{
 		RentedCar rentedCar = await _rentedCarRepository.GetByIdAsync(id);
 		rentedCar = await _rentedCarRepository.DeleteAsync(id);
-		//_mediator.Publish(new CarRentedEvent { DriverId = rentedCar.Id, CarId = rentedCar.CarId, Cancellation = true });
+		_mediator.Publish(new CarRentedEvent { DriverId = rentedCar.Id, CarId = rentedCar.CarId, Cancellation = true });
 		RentedCarDto rentedCarDto = _mapper.Map<RentedCarDto>(rentedCar);
 		return rentedCarDto;
 	}
@@ -70,8 +68,8 @@ public class RentedCarService : IRentedCarService
 
 	public async Task<RentedCarDto> UpdateRentedCarAsync(object id, UpdateRentedCarDto updateRentedCarDto)
 	{
-		var carIdIsExists = await SearchForRentedCarByCarIdAsync(updateRentedCarDto.CarId.ToString());
-		var driverIdIsExists = await SearchForRentedCarByCarIdAsync(updateRentedCarDto.DriverId.ToString());
+		var carIdIsExists = await SearchForRentedCarByCarIdAsync(updateRentedCarDto.CarId) ;
+		var driverIdIsExists = await SearchForRentedCarByDriverIdAsync(updateRentedCarDto.DriverId);
 		if (carIdIsExists is not null)
 		{
 			throw new DbUpdateException("carID you have entered already exist");
@@ -85,22 +83,26 @@ public class RentedCarService : IRentedCarService
 		RentedCar rentedCar = await _rentedCarRepository.GetByIdAsync(id);
 		rentedCar = _mapper.Map(updateRentedCarDto, rentedCar);
 		rentedCar = await _rentedCarRepository.UpdateAsync(rentedCar);
-		//_mediator.Publish(new CarRentedEvent { DriverId = rentedCar.Id, CarId = rentedCar.CarId });
+		_mediator.Publish(new CarRentedEvent { DriverId = rentedCar.Id, CarId = rentedCar.CarId, Cancellation = false });
 
 		RentedCarDto rentedCarDto = _mapper.Map<RentedCarDto>(rentedCar);
 		return rentedCarDto;
 	}
-	public async Task<RentedCarDto> SearchForRentedCarByDriverIdAsync(string driverId)
+	public async Task<RentedCarDto> SearchForRentedCarByDriverIdAsync(Guid? driverId)
 	{
+		if (driverId is null)
+		{
+			return null;
+		}
 		string propertyName = "DriverId";
-		RentedCar car = await _rentedCarRepository.SearchForEntityAsync(propertyName, driverId);
+		RentedCar car = await _rentedCarRepository.SearchForEntityAsync(propertyName, driverId.ToString());
 		RentedCarDto carDto = _mapper.Map<RentedCarDto>(car);
 		return carDto;
 	}
-	public async Task<RentedCarDto> SearchForRentedCarByCarIdAsync(string carId)
+	public async Task<RentedCarDto> SearchForRentedCarByCarIdAsync(Guid? carId)
 	{
 		string propertyName = "CarId";
-		RentedCar car = await _rentedCarRepository.SearchForEntityAsync(propertyName, carId);
+		RentedCar car = await _rentedCarRepository.SearchForEntityAsync(propertyName, carId.ToString());
 		RentedCarDto carDto = _mapper.Map<RentedCarDto>(car);
 		return carDto;
 	}

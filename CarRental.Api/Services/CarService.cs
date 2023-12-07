@@ -10,11 +10,10 @@ public class CarService : ICarService
 	private readonly IUserService _userService;
 	private readonly IDriverService _driverService;
 
-	public CarService(EfCoreCarRepository carRepository, IMapper mapper, IMediator mediator, IUserService userService, IDriverService driverService)
+	public CarService(EfCoreCarRepository carRepository, IMapper mapper, IUserService userService, IDriverService driverService)
 	{
 		_carRepository = carRepository;
 		_mapper = mapper;
-		_mediator = mediator;
 		_userService = userService;
 		_driverService = driverService;
 	}
@@ -87,7 +86,7 @@ public class CarService : ICarService
 	public async Task<CarDto> AddCarAsync(AddCarDto addCarDto)
 	{
 		var serialNumberIsExists = await SearchForCarBySerialNumberAsync(addCarDto.SerialNumber);
-		var driverIdIsExists = await SearchForCarByDriverIdAsync(addCarDto.DriverId.ToString());
+		var driverIdIsExists = await SearchForCarByDriverIdAsync(addCarDto.DriverId);
 		if (serialNumberIsExists is not null)
 		{
 			throw new DbUpdateException("DriverId you have entered already exist");
@@ -113,7 +112,7 @@ public class CarService : ICarService
 
 	public async Task<CarDto> UpdateCarAsync(object carId, UpdateCarDto updateCarDto)
 	{
-		var driverIdIsExists = await SearchForCarByDriverIdAsync(updateCarDto.DriverId.ToString());
+		var driverIdIsExists = await SearchForCarByDriverIdAsync(updateCarDto.DriverId);
 		if (driverIdIsExists is not null)
 		{
 			throw new DbUpdateException("DriverId you have entered already exist");
@@ -143,14 +142,14 @@ public class CarService : ICarService
 	public async Task<CarDto> SearchForCarBySerialNumberAsync(int serialNumber)
 	{
 		string propertyName = "SerialNumber";
-		Car car = await _carRepository.SearchForEntityAsync(propertyName, serialNumber);
+		Car car = await _carRepository.SearchForEntityAsync(propertyName, serialNumber.ToString());
 		CarDto carDto = _mapper.Map<CarDto>(car);
 		return carDto;
 	}
-	public async Task<CarDto> SearchForCarByDriverIdAsync(string driverId)
+	public async Task<CarDto> SearchForCarByDriverIdAsync(Guid? driverId)
 	{
 		string propertyName = "DriverId";
-		Car car = await _carRepository.SearchForEntityAsync(propertyName, driverId);
+		Car car = await _carRepository.SearchForEntityAsync(propertyName, driverId.ToString());
 		CarDto carDto = _mapper.Map<CarDto>(car);
 		return carDto;
 	}
@@ -172,5 +171,12 @@ public class CarService : ICarService
 		return carDtos;
 	}
 
+	//public async Task Handle(CarRentedEvent notification, CancellationToken cancellationToken)
+	//{
+	//	var car = await GetCarByIdAsync(notification.CarId);
+	//	UpdateCarDto updateCarDto = _mapper.Map<UpdateCarDto>(car);
+	//	updateCarDto.IsRented = notification.Cancellation ? false : true;
+	//	await UpdateCarAsync(notification.CarId, updateCarDto);
 
+	//}
 }
