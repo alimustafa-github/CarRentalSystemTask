@@ -84,6 +84,11 @@ public class CarService : ICarService
 
 	public async Task<CarDto> AddCarAsync(AddCarDto addCarDto)
 	{
+		var serialNumber = await SearchForCarBySerialNumberAsync(addCarDto.SerialNumber);
+		if (serialNumber is not null)
+		{
+			throw new DbUpdateException("Serial Number you have entered already exist");
+		}
 		if (addCarDto is null)
 		{
 			throw new ArgumentNullException("the addCarDto is required");
