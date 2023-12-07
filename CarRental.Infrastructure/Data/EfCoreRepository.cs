@@ -130,12 +130,22 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 		var entityType = typeof(TEntity);
 		var parameter = Expression.Parameter(entityType, "e");
 		var property = Expression.Property(parameter, propertyName);
-		var equals = Expression.Equal(property, Expression.Constant(propertyValue));
+
+		// Convert both property value and property to string
+		var propertyAsString = Expression.Call(property, "ToString", null);
+		var propertyValueAsString = Expression.Constant(propertyValue?.ToString());
+
+		// Create the equality expression
+		var equals = Expression.Equal(propertyAsString, propertyValueAsString);
+
+		// Create lambda expression
 		var lambda = Expression.Lambda<Func<TEntity, bool>>(equals, parameter);
 
+		// Query the database
 		var entity = await _context.Set<TEntity>().FirstOrDefaultAsync(lambda);
 
-		return (TEntity?)entity;
+		return entity;
+
 	}
 
 
