@@ -1,4 +1,6 @@
-﻿namespace CarRental.Api.Services;
+﻿using CarRental.Api.Dtos.CarDtos;
+
+namespace CarRental.Api.Services;
 
 public class CarService : ICarService
 {
@@ -84,8 +86,13 @@ public class CarService : ICarService
 
 	public async Task<CarDto> AddCarAsync(AddCarDto addCarDto)
 	{
-		var serialNumber = await SearchForCarBySerialNumberAsync(addCarDto.SerialNumber);
-		if (serialNumber is not null)
+		var serialNumberIsExists = await SearchForCarBySerialNumberAsync(addCarDto.SerialNumber);
+		var driverIdIsExists = await SearchForCarByDriverIdAsync(addCarDto.DriverId.ToString());
+		if (serialNumberIsExists is not null)
+		{
+			throw new DbUpdateException("DriverId you have entered already exist");
+		}
+		if (serialNumberIsExists is not null)
 		{
 			throw new DbUpdateException("Serial Number you have entered already exist");
 		}
@@ -106,6 +113,11 @@ public class CarService : ICarService
 
 	public async Task<CarDto> UpdateCarAsync(object carId, UpdateCarDto updateCarDto)
 	{
+		var driverIdIsExists = await SearchForCarByDriverIdAsync(updateCarDto.DriverId.ToString());
+		if (driverIdIsExists is not null)
+		{
+			throw new DbUpdateException("DriverId you have entered already exist");
+		}
 		Car car = await _carRepository.GetByIdAsync(carId);
 		car = _mapper.Map(updateCarDto, car);
 		car = await _carRepository.UpdateAsync(car);
@@ -132,6 +144,13 @@ public class CarService : ICarService
 	{
 		string propertyName = "SerialNumber";
 		Car car = await _carRepository.SearchForEntityAsync(propertyName, serialNumber);
+		CarDto carDto = _mapper.Map<CarDto>(car);
+		return carDto;
+	}
+	public async Task<CarDto> SearchForCarByDriverIdAsync(string driverId)
+	{
+		string propertyName = "DriverId";
+		Car car = await _carRepository.SearchForEntityAsync(propertyName, driverId);
 		CarDto carDto = _mapper.Map<CarDto>(car);
 		return carDto;
 	}

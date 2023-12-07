@@ -1,4 +1,6 @@
-﻿namespace CarRental.Api.Services;
+﻿using CarRental.Api.Dtos.RentedCarDtos;
+
+namespace CarRental.Api.Services;
 
 public class RentedCarService : IRentedCarService
 {
@@ -17,6 +19,19 @@ public class RentedCarService : IRentedCarService
 
 	public async Task<RentedCarDto> AddRentedCarAsync(AddRentedCarDto addRentedCarDto)
 	{
+		var carIdIsExists = await SearchForRentedCarByCarIdAsync(addRentedCarDto.CarId.ToString());
+		var driverIdIsExists = await SearchForRentedCarByCarIdAsync(addRentedCarDto.DriverId.ToString());
+		if (carIdIsExists is not null)
+		{
+			throw new DbUpdateException("carID you have entered already exist");
+
+		}
+		if (carIdIsExists is not null)
+		{
+			throw new DbUpdateException("DriverId you have entered already exist");
+
+		}
+
 		RentedCar rentedCar = _mapper.Map<RentedCar>(addRentedCarDto);
 		rentedCar = await _rentedCarRepository.AddAsync(rentedCar);
 		//_mediator.Publish(new CarRentedEvent { DriverId = rentedCar.Id, CarId = rentedCar.CarId });
@@ -55,6 +70,18 @@ public class RentedCarService : IRentedCarService
 
 	public async Task<RentedCarDto> UpdateRentedCarAsync(object id, UpdateRentedCarDto updateRentedCarDto)
 	{
+		var carIdIsExists = await SearchForRentedCarByCarIdAsync(updateRentedCarDto.CarId.ToString());
+		var driverIdIsExists = await SearchForRentedCarByCarIdAsync(updateRentedCarDto.DriverId.ToString());
+		if (carIdIsExists is not null)
+		{
+			throw new DbUpdateException("carID you have entered already exist");
+
+		}
+		if (carIdIsExists is not null)
+		{
+			throw new DbUpdateException("DriverId you have entered already exist");
+
+		}
 		RentedCar rentedCar = await _rentedCarRepository.GetByIdAsync(id);
 		rentedCar = _mapper.Map(updateRentedCarDto, rentedCar);
 		rentedCar = await _rentedCarRepository.UpdateAsync(rentedCar);
@@ -63,7 +90,19 @@ public class RentedCarService : IRentedCarService
 		RentedCarDto rentedCarDto = _mapper.Map<RentedCarDto>(rentedCar);
 		return rentedCarDto;
 	}
-
-
+	public async Task<RentedCarDto> SearchForRentedCarByDriverIdAsync(string driverId)
+	{
+		string propertyName = "DriverId";
+		RentedCar car = await _rentedCarRepository.SearchForEntityAsync(propertyName, driverId);
+		RentedCarDto carDto = _mapper.Map<RentedCarDto>(car);
+		return carDto;
+	}
+	public async Task<RentedCarDto> SearchForRentedCarByCarIdAsync(string carId)
+	{
+		string propertyName = "CarId";
+		RentedCar car = await _rentedCarRepository.SearchForEntityAsync(propertyName, carId);
+		RentedCarDto carDto = _mapper.Map<RentedCarDto>(car);
+		return carDto;
+	}
 
 }

@@ -16,7 +16,12 @@ public class DriverService : IDriverService
 
 	public async Task<DriverDto> AddDriverAsync(AddDriverDto addDriverDto)
 	{
-		Driver driver = _mapper.Map<Driver>(addDriverDto);
+		var licenceNumberExists = await SearchForDriverByLicenceNumberAsync(addDriverDto.LicenceNumber);
+		if (licenceNumberExists is not null)
+		{
+			throw new DbUpdateException("the Licence Number you have entered already exsists");
+		}
+	    Driver driver = _mapper.Map<Driver>(addDriverDto);
 		if (driver is null || driver.User is null)
 		{
 			throw new ArgumentNullException("Please Check that the Inputs are correct");
