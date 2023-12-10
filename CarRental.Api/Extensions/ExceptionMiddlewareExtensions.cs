@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
-using System.Net;
-
-namespace CarRental.Api.Extensions;
+﻿namespace CarRental.Api.Extensions;
 
 public static class ExceptionMiddlewareExtensions
 {

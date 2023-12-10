@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace CarRental.Api.Validations.CarDtosValidators;
+﻿namespace CarRental.Api.Validations.CarDtosValidators;
 
 public class UpdateCarDtoValidator : AbstractValidator<UpdateCarDto>
 {

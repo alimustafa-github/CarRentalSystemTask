@@ -1,4 +1,6 @@
-﻿namespace CarRental.Infrastructure.Data;
+﻿using System.Linq;
+
+namespace CarRental.Infrastructure.Data;
 public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 	where TEntity : class
 	where TContext : DbContext
@@ -49,12 +51,21 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 
 	public async Task<TEntity> GetByIdAsync(object id)
 	{
-		TEntity? entity = await _context.Set<TEntity>().FindAsync(id);
-		if (entity is null)
+		try
 		{
-			throw new ArgumentNullException("There is no Entity Corresponds with the give identifier");
+			TEntity? entity = await _context.Set<TEntity>().FindAsync(id);
+			if (entity is null)
+			{
+				throw new ArgumentNullException("There is no Entity Corresponds with the give identifier");
+			}
+			return entity;
 		}
-		return entity;
+		catch (Exception)
+		{
+
+			throw;
+		}
+	
 	}
 
 	public async Task<IEnumerable<TEntity>> GetAllAsync(int pageNumber, int pageSize)
@@ -127,22 +138,26 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 
 	public async Task<TEntity> SearchForEntityAsync(string propertyName, object propertyValue)
 	{
+
 		var entityType = typeof(TEntity);
 		var parameter = Expression.Parameter(entityType, "e");
 		var property = Expression.Property(parameter, propertyName);
 
-		// Convert both property value and property to string
+		if (property.Type == typeof(string))
+		{
+			var equals = Expression.Equal(property, Expression.Constant(propertyValue));
+			var lambda = Expression.Lambda<Func<TEntity, bool>>(equals, parameter);
+			return await _context.Set<TEntity>().FirstOrDefaultAsync(lambda);
+		}
+
 		var propertyAsString = Expression.Call(property, "ToString", null);
 		var propertyValueAsString = Expression.Constant(propertyValue?.ToString());
 
-		// Create the equality expression
-		var equals = Expression.Equal(propertyAsString, propertyValueAsString);
+		var equals2 = Expression.Equal(propertyAsString, propertyValueAsString);
+		var lambda2 = Expression.Lambda<Func<TEntity, bool>>(equals2, parameter);
 
-		// Create lambda expression
-		var lambda = Expression.Lambda<Func<TEntity, bool>>(equals, parameter);
-
-		// Query the database
-		var entity = await _context.Set<TEntity>().FirstOrDefaultAsync(lambda);
+		var entity = await _context.Set<TEntity>()
+			.FirstOrDefaultAsync(lambda2);
 
 		return entity;
 

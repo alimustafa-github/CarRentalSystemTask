@@ -5,12 +5,6 @@ public class AddCustomerDtoValidator : AbstractValidator<AddCustomerDto>
 	public AddCustomerDtoValidator()
 	{
 
-		//RuleFor(x => x.HasLicence)
-		//	.NotEmpty()
-		//	.Must(BeAValidBoolean)
-		//   .WithMessage("The HasLicence field should only be true or false.");
-
-
 		RuleFor(x => x.JoinDate)
 		   .Must(BeWithinOneMonth)
 		   .WithMessage("Join Date must be within one month from the current date.");
@@ -32,9 +26,5 @@ public class AddCustomerDtoValidator : AbstractValidator<AddCustomerDto>
 		DateTime oneMonthLater = DateTime.Now.AddMonths(1);
 
 		return date > oneMonthAgo && date < oneMonthLater;
-	}
-	private bool BeAValidBoolean(bool value)
-	{
-		return value == true || value == false;
 	}
 }

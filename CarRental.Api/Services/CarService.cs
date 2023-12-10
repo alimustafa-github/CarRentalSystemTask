@@ -1,6 +1,4 @@
-﻿using CarRental.Api.Dtos.CarDtos;
-
-namespace CarRental.Api.Services;
+﻿namespace CarRental.Api.Services;
 
 public class CarService : ICarService
 {
@@ -89,11 +87,11 @@ public class CarService : ICarService
 		var driverIdIsExists = await SearchForCarByDriverIdAsync(addCarDto.DriverId);
 		if (serialNumberIsExists is not null)
 		{
-			throw new DbUpdateException("DriverId you have entered already exist");
+			throw new DbUpdateException("SerialNumber you have entered already exist");
 		}
-		if (serialNumberIsExists is not null)
+		if (driverIdIsExists is not null)
 		{
-			throw new DbUpdateException("Serial Number you have entered already exist");
+			throw new DbUpdateException("Driver ID you have entered already exist");
 		}
 		if (addCarDto is null)
 		{
@@ -112,12 +110,17 @@ public class CarService : ICarService
 
 	public async Task<CarDto> UpdateCarAsync(object carId, UpdateCarDto updateCarDto)
 	{
-		var driverIdIsExists = await SearchForCarByDriverIdAsync(updateCarDto.DriverId);
-		if (driverIdIsExists is not null)
-		{
-			throw new DbUpdateException("DriverId you have entered already exist");
-		}
+
 		Car car = await _carRepository.GetByIdAsync(carId);
+		if (car.DriverId != updateCarDto.DriverId)
+		{
+			var driverIdExists = await SearchForCarByDriverIdAsync(updateCarDto.DriverId);
+			if (driverIdExists is not null)
+			{
+				throw new DbUpdateException("the driver you have selected is already taken by another car");
+			}
+
+		}
 		car = _mapper.Map(updateCarDto, car);
 		car = await _carRepository.UpdateAsync(car);
 		CarDto carDto = _mapper.Map<CarDto>(car);
@@ -149,7 +152,7 @@ public class CarService : ICarService
 	public async Task<CarDto> SearchForCarByDriverIdAsync(Guid? driverId)
 	{
 		string propertyName = "DriverId";
-		Car car = await _carRepository.SearchForEntityAsync(propertyName, driverId.ToString());
+		Car car = await _carRepository.SearchForEntityAsync(propertyName, driverId);
 		CarDto carDto = _mapper.Map<CarDto>(car);
 		return carDto;
 	}
@@ -171,12 +174,5 @@ public class CarService : ICarService
 		return carDtos;
 	}
 
-	//public async Task Handle(CarRentedEvent notification, CancellationToken cancellationToken)
-	//{
-	//	var car = await GetCarByIdAsync(notification.CarId);
-	//	UpdateCarDto updateCarDto = _mapper.Map<UpdateCarDto>(car);
-	//	updateCarDto.IsRented = notification.Cancellation ? false : true;
-	//	await UpdateCarAsync(notification.CarId, updateCarDto);
 
-	//}
 }
