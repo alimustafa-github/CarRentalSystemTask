@@ -75,17 +75,20 @@ public class RentedCarService : IRentedCarService
 
 		}
 
-
 		RentedCar rentedCar = await _rentedCarRepository.GetByIdAsync(id);
-		if (rentedCar.DriverId != updateRentedCarDto.DriverId)
+		if (updateRentedCarDto.DriverId is not null)
 		{
-			var driverIdIsExists = await SearchForRentedCarByDriverIdAsync(updateRentedCarDto.DriverId);
-			if (driverIdIsExists is not null)
+			if (rentedCar.DriverId != updateRentedCarDto.DriverId)
 			{
-				throw new DbUpdateException("DriverId you have entered already exist");
+				var driverIdIsExists = await SearchForRentedCarByDriverIdAsync(updateRentedCarDto.DriverId);
+				if (driverIdIsExists is not null)
+				{
+					throw new DbUpdateException("DriverId you have entered already exist");
 
+				}
 			}
 		}
+	
 
 		rentedCar = _mapper.Map(updateRentedCarDto, rentedCar);
 		rentedCar = await _rentedCarRepository.UpdateAsync(rentedCar);
