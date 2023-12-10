@@ -27,12 +27,11 @@ public class RentedCarService : IRentedCarService
 		if (driverIdIsExists is not null)
 		{
 			throw new DbUpdateException("DriverId you have entered already exist");
-
 		}
 
 		RentedCar rentedCar = _mapper.Map<RentedCar>(addRentedCarDto);
 		rentedCar = await _rentedCarRepository.AddAsync(rentedCar);
-		_mediator.Publish(new CarRentedEvent { DriverId = rentedCar.Id, CarId = rentedCar.CarId, Cancellation = false });
+		await _mediator.Publish(new CarRentedEvent { DriverId = rentedCar.DriverId, CarId = rentedCar.CarId, Cancellation = false });
 		RentedCarDto rentedCarDto = _mapper.Map<RentedCarDto>(rentedCar);
 		return rentedCarDto;
 	}
@@ -41,7 +40,7 @@ public class RentedCarService : IRentedCarService
 	{
 		RentedCar rentedCar = await _rentedCarRepository.GetByIdAsync(id);
 		rentedCar = await _rentedCarRepository.DeleteAsync(id);
-		_mediator.Publish(new CarRentedEvent { DriverId = rentedCar.Id, CarId = rentedCar.CarId, Cancellation = true });
+		await _mediator.Publish(new CarRentedEvent { DriverId = rentedCar.DriverId, CarId = rentedCar.CarId, Cancellation = true });
 		RentedCarDto rentedCarDto = _mapper.Map<RentedCarDto>(rentedCar);
 		return rentedCarDto;
 	}
@@ -88,11 +87,11 @@ public class RentedCarService : IRentedCarService
 				}
 			}
 		}
-	
+
 
 		rentedCar = _mapper.Map(updateRentedCarDto, rentedCar);
 		rentedCar = await _rentedCarRepository.UpdateAsync(rentedCar);
-		_mediator.Publish(new CarRentedEvent { DriverId = rentedCar.Id, CarId = rentedCar.CarId, Cancellation = false });
+		await _mediator.Publish(new CarRentedEvent { DriverId = rentedCar.DriverId, CarId = rentedCar.CarId, Cancellation = false });
 
 		RentedCarDto rentedCarDto = _mapper.Map<RentedCarDto>(rentedCar);
 		return rentedCarDto;
@@ -114,6 +113,14 @@ public class RentedCarService : IRentedCarService
 		RentedCar car = await _rentedCarRepository.SearchForEntityAsync(propertyName, carId);
 		RentedCarDto carDto = _mapper.Map<RentedCarDto>(car);
 		return carDto;
+	}
+
+
+	public class CarRentedEvent : INotification
+	{
+		public Guid CarId { get; set; }
+		public Guid? DriverId { get; set; }
+		public bool Cancellation { get; set; } = false;
 	}
 
 }
