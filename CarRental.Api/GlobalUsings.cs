@@ -26,3 +26,6 @@ global using System.Security.Claims;
 global using CarRental.Api.Dtos.CarTypeDtos;
 global using CarRental.Api.Dtos.RentedCarDtos;
 global using MediatR;
+global using Microsoft.AspNetCore.Diagnostics;
+global using System.Net;
+global using System.Text.Json;

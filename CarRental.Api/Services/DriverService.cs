@@ -17,11 +17,21 @@ public class DriverService : IDriverService
 	public async Task<DriverDto> AddDriverAsync(AddDriverDto addDriverDto)
 	{
 		var licenceNumberExists = await SearchForDriverByLicenceNumberAsync(addDriverDto.LicenceNumber);
+
 		if (licenceNumberExists is not null)
 		{
 			throw new DbUpdateException("the Licence Number you have entered already exsists");
 		}
-	    Driver driver = _mapper.Map<Driver>(addDriverDto);
+		if (addDriverDto.AlternativeDriverId is not null)
+		{
+			var alternativeDriverExists = await SearchForDriverByAlternativeDriverIdAsync(addDriverDto.AlternativeDriverId);
+
+			if (alternativeDriverExists is not null)
+			{
+				throw new DbUpdateException("the alternative Driver you have entered already exsists");
+			}
+		}
+		Driver driver = _mapper.Map<Driver>(addDriverDto);
 		if (driver is null || driver.User is null)
 		{
 			throw new ArgumentNullException("Please Check that the Inputs are correct");
@@ -109,6 +119,14 @@ public class DriverService : IDriverService
 		return _mapper.Map<IEnumerable<DriverDto>>(drivers);
 	}
 
+	public async Task<DriverDto> SearchForDriverByAlternativeDriverIdAsync(Guid? altDriverId)
+	{
+		string propertyName = "AlternativeDriverId";
+		Driver driver = await _driverRepository.SearchForEntityAsync(propertyName, altDriverId);
+		DriverDto driverDto = _mapper.Map<DriverDto>(driver);
+
+		return driverDto;
+	}
 
 
 }

@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-
-namespace CarRental.Api;
+﻿namespace CarRental.Api;
 
 public record ErrorDetails
 {
