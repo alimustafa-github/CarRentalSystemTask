@@ -13,7 +13,6 @@ public class UserService : IUserService
 		_roleManager = roleManager;
 		_jwtTokenGenerator = jwtTokenGenerator;
 		_mapper = mapper;
-
 	}
 
 
@@ -55,7 +54,6 @@ public class UserService : IUserService
 			return ex.Message.ToString();
 		}
 	}
-
 
 	public async Task<bool> AssignRoleAsync(string email, string roleName)
 	{
@@ -138,4 +136,6 @@ public class UserService : IUserService
 		ApplicationUserDto userDto = _mapper.Map<ApplicationUserDto>(user);
 		return userDto;
 	}
+
+
 }

@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace CarRental.Infrastructure.Data;
+﻿namespace CarRental.Infrastructure.Data;
 public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 	where TEntity : class
 	where TContext : DbContext

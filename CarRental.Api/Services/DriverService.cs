@@ -1,13 +1,12 @@
 ﻿namespace CarRental.Api.Services;
 
-public class DriverService : IDriverService
+public class DriverService : IDriverService, INotificationHandler<RentedCarService.CarRentedEvent>
 {
 	private readonly IUserService _userService;
 	private readonly EfCoreDriverRepository _driverRepository;
 	private readonly IMapper _mapper;
 
-
-	public DriverService(IUserService userService,EfCoreDriverRepository driverRepository, IMapper mapper)
+	public DriverService(IUserService userService, EfCoreDriverRepository driverRepository, IMapper mapper)
 	{
 		_userService = userService;
 		_driverRepository = driverRepository;
@@ -36,8 +35,9 @@ public class DriverService : IDriverService
 		{
 			throw new ArgumentNullException("Please Check that the Inputs are correct");
 		}
+
 		driver.UserId = driver.User.Id;
-		driver.User.IsDriver = true;
+		driver.User.IsDriver = true;       
 
 		await _driverRepository.AddAsync(driver);
 		DriverDto driverDto = _mapper.Map<DriverDto>(driver);
@@ -128,5 +128,13 @@ public class DriverService : IDriverService
 		return driverDto;
 	}
 
-
+	public async Task Handle(RentedCarService.CarRentedEvent notification, CancellationToken cancellationToken)
+	{
+		Driver driver = await _driverRepository.GetByIdAsync(notification.DriverId);
+		if (driver is not null)
+		{
+			driver.IsAvailable = notification.Cancellation == true ? true : false;
+			await _driverRepository.UpdateAsync(driver);
+		}
+	}
 }

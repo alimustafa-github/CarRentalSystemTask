@@ -1,6 +1,6 @@
 ﻿namespace CarRental.Api.Services;
 
-public class CarService : ICarService
+public class CarService : ICarService, INotificationHandler<RentedCarService.CarRentedEvent>
 {
 	private readonly EfCoreCarRepository _carRepository;
 	private readonly IMapper _mapper;
@@ -174,5 +174,14 @@ public class CarService : ICarService
 		return carDtos;
 	}
 
-
+	public async Task Handle(RentedCarService.CarRentedEvent notification, CancellationToken cancellationToken)
+	{
+		CarDto carDto = await GetCarByIdAsync(notification.CarId);
+		if (carDto is not null)
+		{
+			carDto.IsRented = notification.Cancellation == true ? false : true;
+			UpdateCarDto updateCarDto = _mapper.Map<UpdateCarDto>(carDto);
+			await UpdateCarAsync(carDto.Id, updateCarDto);
+		}
+	}
 }
