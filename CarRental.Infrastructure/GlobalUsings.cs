@@ -10,3 +10,4 @@ global using CarRental.Infrastructure.Data.DataBaseConfiguration.IdentityConfigu
 global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 global using CarRental.Core.Interfaces;
 global using System.Linq.Expressions;
+global using System.Reflection;

@@ -183,6 +183,15 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 
 	public IQueryable<TEntity> ApplySorting(IQueryable<TEntity> query, string sortingProperty, bool ascending)
 	{
+
+
+		PropertyInfo propertyExists = typeof(TEntity).GetProperty(sortingProperty, BindingFlags.Public | BindingFlags.Instance);
+		if (propertyExists is null)
+		{
+			throw new InvalidOperationException("Please make sure that you have entered a valid sorting property");
+
+		}
+
 		var parameter = Expression.Parameter(typeof(TEntity), "c");
 		var property = Expression.Property(parameter, sortingProperty);
 		var lambda = Expression.Lambda<Func<TEntity, object>>(Expression.Convert(property, typeof(object)), parameter);
@@ -191,6 +200,11 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 	}
 	public IQueryable<TEntity> ApplySearching(IQueryable<TEntity> query, string searchProperty, object searchValue)
 	{
+		PropertyInfo propertyExists = typeof(TEntity).GetProperty(searchProperty, BindingFlags.Public | BindingFlags.Instance);
+		if (propertyExists is null)
+		{
+			throw new InvalidOperationException("Please double check the SearchProperty is correct");
+		}
 		var parameter = Expression.Parameter(typeof(TEntity));
 		var propertyAccess = Expression.Property(parameter, searchProperty);
 
