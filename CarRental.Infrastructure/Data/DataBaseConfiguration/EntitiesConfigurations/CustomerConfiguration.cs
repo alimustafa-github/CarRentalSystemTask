@@ -18,13 +18,13 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
 		builder.Property(c => c.HasLicence).IsRequired().HasDefaultValue(false);
 
-		builder.Property(c => c.LicenseNumber).IsRequired(false);
-		builder.Property(c => c.LicenseNumber).HasMaxLength(12).IsUnicode(false);
-		builder.HasIndex(c => c.LicenseNumber).IsUnique();//todo : the licence number for the customer is not required
+		builder.Property(c => c.LicenceNumber).IsRequired(false);
+		builder.Property(c => c.LicenceNumber).HasMaxLength(12).IsUnicode(false);
+		builder.HasIndex(c => c.LicenceNumber).IsUnique();
 
 		builder.Property(c => c.LicenseExpirationDate).IsRequired(false);
 
-		builder.Property(c => c.JoinDate).IsRequired().HasDefaultValue(DateTime.Now);
+		builder.Property(c => c.JoinDate).IsRequired();
 
 
 

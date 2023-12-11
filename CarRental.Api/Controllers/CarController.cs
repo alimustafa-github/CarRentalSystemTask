@@ -24,10 +24,26 @@ public class CarController : ControllerBase
 	}
 
 
-	[HttpGet("getcars/{pagenumber}/{pagesize}")]
-	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCarsFrom(int pagenumber, int pagesize = 15)
+	[HttpPost("getcarslist")]
+	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCars([FromBody] CarRequestDto carRequestDto)
 	{
-		IEnumerable<CarDto> carDtos = await _carService.GetCarsAsync(pagenumber, pagesize);
+		IEnumerable<CarDto> carDtos = null;
+		if (carRequestDto.FilteringBySerialNumber == false && carRequestDto.SortBySerialNumber == false)
+		{
+			carDtos = await _carService.GetCarsAsync(carRequestDto.PageNumber, carRequestDto.PageSize);
+		}
+		else if (carRequestDto.SortBySerialNumber && !carRequestDto.FilteringBySerialNumber)
+		{
+			carDtos = await _carService.SortCarsBySerialNumber(carRequestDto.PageNumber, carRequestDto.PageSize);
+		}
+		else if (carRequestDto.FilteringBySerialNumber && !carRequestDto.SortBySerialNumber)
+		{
+			carDtos = await _carService.FilterTheCarsBySerialNumber(carRequestDto.SearchBySerialNumber.ToString(), carRequestDto.PageNumber, carRequestDto.PageSize);
+		}
+		else if (carRequestDto.FilteringBySerialNumber && carRequestDto.SortBySerialNumber)
+		{
+			carDtos = _carService.FilterTheCarsBySerialNumber(carRequestDto.SearchBySerialNumber.ToString(), carRequestDto.PageNumber, carRequestDto.PageSize).Result.OrderBy(c => c.SerialNumber);
+		}
 
 		return new ApiResponse<IEnumerable<CarDto>>
 		{
@@ -97,72 +113,72 @@ public class CarController : ControllerBase
 
 
 
-	[HttpGet("sortcarsbyserialnumber/{pagenumber}/{pagesize}")]
-	public async Task<ApiResponse<IEnumerable<CarDto>>> SortTheCarsBySerialNumber(int pagenumber, int pagesize = 15)
-	{
-		IEnumerable<CarDto> carDtos = await _carService.SortCarsBySerialNumber(pagenumber, pagesize);
+	//[HttpGet("sortcarsbyserialnumber/{pagenumber}/{pagesize}")]
+	//public async Task<ApiResponse<IEnumerable<CarDto>>> SortTheCarsBySerialNumber(int pagenumber, int pagesize = 15)
+	//{
+	//	IEnumerable<CarDto> carDtos = await _carService.SortCarsBySerialNumber(pagenumber, pagesize);
 
-		return new ApiResponse<IEnumerable<CarDto>>
-		{
-			IsSuccess = true,
-			Data = carDtos,
-			StatusCode = StatusCodes.Status200OK,
-			Message = string.Empty
-		};
-	}
-
-
-
-	[HttpGet("searchbyserialnumber/{number}")]
-	public async Task<ApiResponse<CarDto>> SearchBySerialNumber(int number)
-	{
-		CarDto carDto = await _carService.SearchForCarBySerialNumberAsync(number);
-		if (carDto is null)
-		{
-			return new ApiResponse<CarDto>
-			{
-				IsSuccess = false,
-				Data = null,
-				StatusCode = StatusCodes.Status404NotFound,
-				Message = "No car has been found"
-			};
-		}
-		return new ApiResponse<CarDto>
-		{
-			IsSuccess = true,
-			Data = carDto,
-			StatusCode = StatusCodes.Status200OK,
-			Message = string.Empty
-		};
-	}
+	//	return new ApiResponse<IEnumerable<CarDto>>
+	//	{
+	//		IsSuccess = true,
+	//		Data = carDtos,
+	//		StatusCode = StatusCodes.Status200OK,
+	//		Message = string.Empty
+	//	};
+	//}
 
 
 
+	//[HttpGet("searchbyserialnumber/{number}")]
+	//public async Task<ApiResponse<CarDto>> SearchBySerialNumber(int number)
+	//{
+	//	CarDto carDto = await _carService.SearchForCarBySerialNumberAsync(number);
+	//	if (carDto is null)
+	//	{
+	//		return new ApiResponse<CarDto>
+	//		{
+	//			IsSuccess = false,
+	//			Data = null,
+	//			StatusCode = StatusCodes.Status404NotFound,
+	//			Message = "No car has been found"
+	//		};
+	//	}
+	//	return new ApiResponse<CarDto>
+	//	{
+	//		IsSuccess = true,
+	//		Data = carDto,
+	//		StatusCode = StatusCodes.Status200OK,
+	//		Message = string.Empty
+	//	};
+	//}
 
-	[HttpGet("filtercarsbyserialnumber/{number}")]
-	public async Task<ApiResponse<IEnumerable<CarDto>>> FilterTheCars(string number)
-	{
-		IEnumerable<CarDto> carDtos = await _carService.FilterTheCarsBySerialNumber(number);
 
-		if (carDtos is not null && carDtos.ToList().Count > 0)
-		{
-			return new ApiResponse<IEnumerable<CarDto>>
-			{
-				IsSuccess = true,
-				Data = carDtos,
-				Message = string.Empty
-			};
-		}
 
-		return new ApiResponse<IEnumerable<CarDto>>
-		{
-			IsSuccess = false,
-			Data = Enumerable.Empty<CarDto>(),
-			StatusCode = StatusCodes.Status404NotFound,
-			Message = "No car has been found"
-		};
 
-	}
+	//[HttpGet("filtercarsbyserialnumber/{number}")]
+	//public async Task<ApiResponse<IEnumerable<CarDto>>> FilterTheCars(string number)
+	//{
+	//	IEnumerable<CarDto> carDtos = await _carService.FilterTheCarsBySerialNumber(number);
+
+	//	if (carDtos is not null && carDtos.ToList().Count > 0)
+	//	{
+	//		return new ApiResponse<IEnumerable<CarDto>>
+	//		{
+	//			IsSuccess = true,
+	//			Data = carDtos,
+	//			Message = string.Empty
+	//		};
+	//	}
+
+	//	return new ApiResponse<IEnumerable<CarDto>>
+	//	{
+	//		IsSuccess = false,
+	//		Data = Enumerable.Empty<CarDto>(),
+	//		StatusCode = StatusCodes.Status404NotFound,
+	//		Message = "No car has been found"
+	//	};
+
+	//}
 
 
 }

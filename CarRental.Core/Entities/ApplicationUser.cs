@@ -1,4 +1,6 @@
-﻿namespace CarRental.Core.Entities;
+﻿using Microsoft.VisualBasic;
+
+namespace CarRental.Core.Entities;
 public class ApplicationUser : IdentityUser
 {
 	
@@ -7,7 +9,7 @@ public class ApplicationUser : IdentityUser
     public Driver Driver { get; set; }
     public Customer Customer { get; set; }
     public DateTime? DateOfBirth { get; set; }
-	public string? CurrentAddress { get; set; }
+    public string? CurrentAddress { get; set; }
     public bool IsCustomer { get; set; }
     public bool IsDriver { get; set; }
 	public string? EmergencyContactName { get; set; }

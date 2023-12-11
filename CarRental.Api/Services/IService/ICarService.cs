@@ -11,6 +11,6 @@ public interface ICarService
 	Task<CarDto> UpdateCarAsync(object carId, UpdateCarDto carDto);
 	Task<CarDto> GetCarByIdAsync(Guid id);
 
-	Task<IEnumerable<CarDto>> FilterTheCarsBySerialNumber(string value);
+	Task<IEnumerable<CarDto>> FilterTheCarsBySerialNumber(string value, int pageNumber, int pageSize);
 
 }

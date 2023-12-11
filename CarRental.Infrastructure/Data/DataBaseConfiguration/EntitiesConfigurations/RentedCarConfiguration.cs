@@ -21,9 +21,9 @@ public class RentedCarConfiguration : IEntityTypeConfiguration<RentedCar>
 			   .HasForeignKey(r => r.CustomerId)
 			   .OnDelete(DeleteBehavior.Cascade);
 
-		builder.Property(r=>r.ReservationStartDate).IsRequired().HasDefaultValue(DateTime.Now);
+		builder.Property(r => r.ReservationStartDate).IsRequired();
 
-		builder.Property(r => r.ReservationEndDate).IsRequired().HasDefaultValue(DateTime.Now.AddMonths(6));
+		builder.Property(r => r.ReservationEndDate).IsRequired();
 
 	}
 }

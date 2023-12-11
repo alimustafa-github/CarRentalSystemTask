@@ -87,7 +87,7 @@ public class CustomerController : ControllerBase
 	}
 
 
-	[HttpGet("searchfordriver/{licenceNumber}")]
+	[HttpGet("searchforcustomer/{licenceNumber}")]
 	public async Task<ApiResponse<CustomerDto>> SearchForCustomerrByLicenceNumber(string licenceNumber)
 	{
 		CustomerDto customerDto = await _customerService.SearchForCustomerByLicenceNumberAsync(licenceNumber);

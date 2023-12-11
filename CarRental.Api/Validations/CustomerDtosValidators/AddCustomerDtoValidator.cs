@@ -10,10 +10,10 @@ public class AddCustomerDtoValidator : AbstractValidator<AddCustomerDto>
 		   .WithMessage("Join Date must be within one month from the current date.");
 
 
-		RuleFor(c => c.LicenseNumber).Empty().When(c => !c.HasLicence).
+		RuleFor(c => c.LicenceNumber).Empty().When(c => !c.HasLicence).
 			WithMessage("The Licnece number is empty as long the user does not have a lincence");
 
-		RuleFor(d => d.LicenseNumber).NotEmpty()
+		RuleFor(d => d.LicenceNumber).NotEmpty()
 			.WithMessage("The Licnece number should not be empty as long the user does have a lincence")
 			.Length(8).WithMessage("The LicenceNumber should exactly be 8 charachters longs")
 			.Must(licenceNumber => !licenceNumber.ToString().Contains(" ")).When(c => c.HasLicence).WithMessage("The LicenceNumber must not contain any spaces");

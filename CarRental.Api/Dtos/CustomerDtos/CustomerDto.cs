@@ -6,7 +6,7 @@ public record CustomerDto
 	public ApplicationUserDto User { get; set; }
 
 	public bool HasLicence { get; set; }
-	public string LicenseNumber { get; set; }
+	public string LicenceNumber { get; set; }
 	public DateTime? LicenceExpirationDate { get; set; }
 	public DateTime JoinDate { get; set; }
 	public Guid MembershipId { get; set; }
