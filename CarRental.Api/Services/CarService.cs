@@ -1,4 +1,6 @@
-﻿namespace CarRental.Api.Services;
+﻿using System.Reflection;
+
+namespace CarRental.Api.Services;
 
 public class CarService : ICarService, INotificationHandler<RentedCarService.CarRentedEvent>
 {
@@ -15,58 +17,42 @@ public class CarService : ICarService, INotificationHandler<RentedCarService.Car
 		_driverService = driverService;
 	}
 
-	public async Task<IEnumerable<CarDto>> GetCarsFromCacheAsync(int pageNumber, int pageSize)
+
+	public async Task<(IEnumerable<CarDto>, int)> GetCarsWithSortingAndFiltering(CarRequestDto input)
 	{
-		IEnumerable<Car> cars = await _carRepository.GetFromCacheAsync(pageNumber, pageSize);
-		IEnumerable<ApplicationUserDto> userDtos = await _userService.GetAllUsersAsync();
-		IEnumerable<DriverDto> driverDtos = await _driverService.GetDriversAsync(pageNumber, pageSize);
+		IQueryable<Car> query = _carRepository.GetQuery();
 
-		IEnumerable<CarDto> carDtos = from car in cars
-									  join driver in driverDtos on car.DriverId equals driver.Id
-									  join user in userDtos on driver.UserId equals user.Id
-									  select new CarDto
-									  {
-										  Id = car.Id,
-										  DailyFaire = car.DailyFaire,
-										  DriverFullName = user.FirstName + " " + user.LastName,
-										  CarTypeId = car.CarTypeId,
-										  IsRented = car.IsRented,
-										  Color = car.Color,
-										  EngineCapacity = car.EngineCapacity,
-										  SerialNumber = car.SerialNumber
-									  };
-		if (carDtos is null)
+		PropertyInfo searchingProperty = typeof(Car).GetProperty(input.SearchProperty, BindingFlags.Public | BindingFlags.Instance);
+		if (searchingProperty is null)
 		{
-			throw new ArgumentNullException("Mapping Failed");
+			throw new InvalidOperationException("Please double check the SearchProperty is correct");
 		}
-		return carDtos;
 
-	}
-	public async Task<IEnumerable<CarDto>> GetCarsAsync(int pageNumber, int pageSize)
-	{
-		IEnumerable<Car> cars = await _carRepository.GetAllAsync(pageNumber, pageSize);
-		IEnumerable<ApplicationUserDto> userDtos = await _userService.GetAllUsersAsync();
-		IEnumerable<DriverDto> driverDtos = await _driverService.GetDriversAsync(pageNumber, pageSize);
-
-		IEnumerable<CarDto> carDtos = from car in cars
-									  join driver in driverDtos on car.DriverId equals driver.Id
-									  join user in userDtos on driver.UserId equals user.Id
-									  select new CarDto
-									  {
-										  Id = car.Id,
-										  DailyFaire = car.DailyFaire,
-										  DriverFullName = user.FirstName + " " + user.LastName,
-										  CarTypeId = car.CarTypeId,
-										  IsRented = car.IsRented,
-										  Color = car.Color,
-										  EngineCapacity = car.EngineCapacity,
-										  SerialNumber = car.SerialNumber
-									  };
-		if (carDtos is null)
+		PropertyInfo sortingProperty = typeof(Car).GetProperty(input.SortingProperty, BindingFlags.Public | BindingFlags.Instance);
+		if (sortingProperty is null)
 		{
-			throw new ArgumentNullException("Mapping Failed");
+			throw new InvalidOperationException("Please make sure that you have entered a valid sorting property");
+
 		}
-		return carDtos;
+		if (!string.IsNullOrEmpty(input.SearchProperty) && !string.IsNullOrEmpty(input.SearchValue))
+		{
+			query = _carRepository.ApplySearching(query, input.SearchProperty, input.SearchValue);
+		}
+
+		int totalCount = await query.CountAsync();
+
+		int recordsToSkip = (input.PageNumber - 1) * input.PageSize;
+
+		query = query.Skip(recordsToSkip).Take(input.PageSize);
+
+		if (!string.IsNullOrWhiteSpace(input.SortingProperty))
+		{
+			query = _carRepository.ApplySorting(query, input.SortingProperty, input.Ascending);
+		}
+
+		IEnumerable<Car> cars = await query.ToListAsync();
+		IEnumerable<CarDto> carDtos = _mapper.Map<IEnumerable<CarDto>>(cars);
+		return (carDtos, totalCount);
 	}
 
 	public async Task<CarDto> GetCarByIdAsync(Guid id)
@@ -141,37 +127,22 @@ public class CarService : ICarService, INotificationHandler<RentedCarService.Car
 		return carDto;
 	}
 
-	public async Task<CarDto> SearchForCarBySerialNumberAsync(int serialNumber)
+	private async Task<CarDto> SearchForCarBySerialNumberAsync(int serialNumber)
 	{
 		string propertyName = "SerialNumber";
 		Car car = await _carRepository.SearchForEntityAsync(propertyName, serialNumber.ToString());
 		CarDto carDto = _mapper.Map<CarDto>(car);
 		return carDto;
 	}
-	public async Task<CarDto> SearchForCarByDriverIdAsync(Guid? driverId)
+	private async Task<CarDto> SearchForCarByDriverIdAsync(Guid? driverId)
 	{
-		string propertyName = "DriverId";
-		Car car = await _carRepository.SearchForEntityAsync(propertyName, driverId);
+		IQueryable<Car> carsQuery = _carRepository.GetQuery();
+		var car = await carsQuery.FirstOrDefaultAsync(car => car.DriverId == driverId);
+
 		CarDto carDto = _mapper.Map<CarDto>(car);
 		return carDto;
 	}
 
-
-	public async Task<IEnumerable<CarDto>> SortCarsBySerialNumber(int pageNumber, int pageSize)
-	{
-		IEnumerable<Car> cars = await _carRepository.SortAsync(c => c.SerialNumber, pageNumber, pageSize);
-		IEnumerable<CarDto> carDtos = _mapper.Map<IEnumerable<CarDto>>(cars);
-		return carDtos;
-
-	}
-
-	public async Task<IEnumerable<CarDto>> FilterTheCarsBySerialNumber(string value, int pageNumber, int pageSize)
-	{
-		string propertyName = "SerialNumber";
-		IEnumerable<Car> cars = await _carRepository.FilterTheRecords(propertyName, value,pageNumber,pageSize);
-		IEnumerable<CarDto> carDtos = _mapper.Map<IEnumerable<CarDto>>(cars);
-		return carDtos;
-	}
 
 	public async Task Handle(RentedCarService.CarRentedEvent notification, CancellationToken cancellationToken)
 	{
@@ -183,4 +154,6 @@ public class CarService : ICarService, INotificationHandler<RentedCarService.Car
 			await UpdateCarAsync(carDto.Id, updateCarDto);
 		}
 	}
+
+
 }

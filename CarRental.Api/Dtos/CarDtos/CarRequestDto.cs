@@ -2,12 +2,18 @@
 
 public record CarRequestDto
 {
-	public int PageNumber { get; set; } = 1;
-	public int PageSize { get; set; } = 10;
-	public bool SortBySerialNumber { get; set; } = false;
+	public int PageNumber { get; set; }
+	public int PageSize { get; set; }
+	public string? SortingProperty { get; set; }
 
-	public int SearchBySerialNumber { get; set; } = 0;
+	public bool Ascending { get; set; }
 
-	public bool FilteringBySerialNumber { get; set; } = false;
+    public string? SearchProperty { get; set; }
+    public string? SearchValue { get; set; }
+
+    //public string SearchBySerialNumber { get; set; }
+    //public Guid? TypeId { get; set; }
+
+    //public bool FilteringBySerialNumber { get; set; } = false;
 
 }

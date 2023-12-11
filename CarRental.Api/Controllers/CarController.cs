@@ -4,55 +4,15 @@
 public class CarController : ControllerBase
 {
 	private readonly ICarService _carService;
+	private readonly IMapper _mapper;
 
-	public CarController(ICarService carService)
+	public CarController(ICarService carService, IMapper mapper)
 	{
 		_carService = carService;
-	}
-
-	[HttpGet("getcarsfromcache/{pagenumber}/{pagesize}")]
-	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCarsFromCache(int pagenumber, int pagesize = 15)
-	{
-		IEnumerable<CarDto> carDtos = await _carService.GetCarsFromCacheAsync(pagenumber, pagesize);
-		return new ApiResponse<IEnumerable<CarDto>>
-		{
-			StatusCode = StatusCodes.Status200OK,
-			IsSuccess = true,
-			Data = carDtos,
-			Message = string.Empty
-		};
+		_mapper = mapper;
 	}
 
 
-	[HttpPost("getcarslist")]
-	public async Task<ApiResponse<IEnumerable<CarDto>>> GetAllCars([FromBody] CarRequestDto carRequestDto)
-	{
-		IEnumerable<CarDto> carDtos = null;
-		if (carRequestDto.FilteringBySerialNumber == false && carRequestDto.SortBySerialNumber == false)
-		{
-			carDtos = await _carService.GetCarsAsync(carRequestDto.PageNumber, carRequestDto.PageSize);
-		}
-		else if (carRequestDto.SortBySerialNumber && !carRequestDto.FilteringBySerialNumber)
-		{
-			carDtos = await _carService.SortCarsBySerialNumber(carRequestDto.PageNumber, carRequestDto.PageSize);
-		}
-		else if (carRequestDto.FilteringBySerialNumber && !carRequestDto.SortBySerialNumber)
-		{
-			carDtos = await _carService.FilterTheCarsBySerialNumber(carRequestDto.SearchBySerialNumber.ToString(), carRequestDto.PageNumber, carRequestDto.PageSize);
-		}
-		else if (carRequestDto.FilteringBySerialNumber && carRequestDto.SortBySerialNumber)
-		{
-			carDtos = _carService.FilterTheCarsBySerialNumber(carRequestDto.SearchBySerialNumber.ToString(), carRequestDto.PageNumber, carRequestDto.PageSize).Result.OrderBy(c => c.SerialNumber);
-		}
-
-		return new ApiResponse<IEnumerable<CarDto>>
-		{
-			StatusCode = StatusCodes.Status200OK,
-			IsSuccess = true,
-			Data = carDtos,
-			Message = string.Empty
-		};
-	}
 
 
 
@@ -112,6 +72,25 @@ public class CarController : ControllerBase
 	}
 
 
+
+
+	[HttpPost("getcarslist")]
+	public async Task<ApiResponse<IEnumerable<CarDto>>> GetCarsWithSortingAndPagination([FromBody] CarRequestDto input)
+	{
+		var result = await _carService.GetCarsWithSortingAndFiltering(input);
+		IEnumerable<CarDto> carDtos = result.Item1;
+		int Count = result.Item2;
+
+
+		return new ApiResponse<IEnumerable<CarDto>>
+		{
+			TotalCount = Count,
+			IsSuccess = true,
+			Message = string.Empty,
+			Data = carDtos,
+			StatusCode = StatusCodes.Status200OK
+		};
+	}
 
 	//[HttpGet("sortcarsbyserialnumber/{pagenumber}/{pagesize}")]
 	//public async Task<ApiResponse<IEnumerable<CarDto>>> SortTheCarsBySerialNumber(int pagenumber, int pagesize = 15)

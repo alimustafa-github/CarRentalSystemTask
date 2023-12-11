@@ -29,3 +29,4 @@ global using MediatR;
 global using Microsoft.AspNetCore.Diagnostics;
 global using System.Net;
 global using System.Text.Json;
+global using System.Linq.Expressions;

@@ -11,6 +11,11 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 		this._context = context;
 		_memoryCache = memoryCache;
 	}
+
+	public IQueryable<TEntity> GetQuery()
+	{
+		return _context.Set<TEntity>().AsQueryable();
+	}
 	public async Task<TEntity> AddAsync(TEntity entity)
 	{
 		_context.Set<TEntity>().Add(entity);
@@ -172,6 +177,43 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 		int recordsToSkip = (pageNumber - 1) * pageSize;
 
 		return filteredEntities.Skip(recordsToSkip).Take(pageSize);
+	}
+
+
+
+	public IQueryable<TEntity> ApplySorting(IQueryable<TEntity> query, string sortingProperty, bool ascending)
+	{
+		var parameter = Expression.Parameter(typeof(TEntity), "c");
+		var property = Expression.Property(parameter, sortingProperty);
+		var lambda = Expression.Lambda<Func<TEntity, object>>(Expression.Convert(property, typeof(object)), parameter);
+
+		return ascending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
+	}
+	public IQueryable<TEntity> ApplySearching(IQueryable<TEntity> query, string searchProperty, object searchValue)
+	{
+		var parameter = Expression.Parameter(typeof(TEntity));
+		var propertyAccess = Expression.Property(parameter, searchProperty);
+
+		// Convert the property to a string if it's not already
+		Expression convertedProperty = propertyAccess;
+		if (propertyAccess.Type != typeof(string))
+		{
+			var toStringMethod = typeof(object).GetMethod("ToString");
+			convertedProperty = Expression.Call(propertyAccess, toStringMethod);
+		}
+
+		// Create an expression representing the 'Contains' operation on the property
+		var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+		var containsExpression = Expression.Call(convertedProperty, containsMethod, Expression.Constant(searchValue.ToString(), typeof(string)));
+
+		// Combine the property access and 'contains' expression into a lambda expression
+		var lambda = Expression.Lambda<Func<TEntity, bool>>(containsExpression, parameter);
+
+		// Use the lambda expression in a Where clause to filter the entities
+		var filteredEntities = query.Where(lambda);
+
+		return filteredEntities;
+
 	}
 
 }
