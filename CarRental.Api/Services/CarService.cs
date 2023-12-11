@@ -1,4 +1,6 @@
-﻿namespace CarRental.Api.Services;
+﻿using System.Reflection;
+
+namespace CarRental.Api.Services;
 
 public class CarService : ICarService, INotificationHandler<RentedCarService.CarRentedEvent>
 {
@@ -20,6 +22,18 @@ public class CarService : ICarService, INotificationHandler<RentedCarService.Car
 	{
 		IQueryable<Car> query = _carRepository.GetQuery();
 
+		PropertyInfo searchingProperty = typeof(Car).GetProperty(input.SearchProperty, BindingFlags.Public | BindingFlags.Instance);
+		if (searchingProperty is null)
+		{
+			throw new InvalidOperationException("Please double check the SearchProperty is correct");
+		}
+
+		PropertyInfo sortingProperty = typeof(Car).GetProperty(input.SortingProperty, BindingFlags.Public | BindingFlags.Instance);
+		if (sortingProperty is null)
+		{
+			throw new InvalidOperationException("Please make sure that you have entered a valid sorting property");
+
+		}
 		if (!string.IsNullOrEmpty(input.SearchProperty) && !string.IsNullOrEmpty(input.SearchValue))
 		{
 			query = _carRepository.ApplySearching(query, input.SearchProperty, input.SearchValue);
