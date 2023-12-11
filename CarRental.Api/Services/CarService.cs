@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace CarRental.Api.Services;
+﻿namespace CarRental.Api.Services;
 
 public class CarService : ICarService, INotificationHandler<RentedCarService.CarRentedEvent>
 {
