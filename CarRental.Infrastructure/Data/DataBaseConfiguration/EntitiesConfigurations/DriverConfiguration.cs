@@ -21,9 +21,9 @@ public class DriverConfiguration : IEntityTypeConfiguration<Driver>
 
 		builder.Property(d => d.TotalRentalCount).IsRequired().HasDefaultValue(0);
 
-		builder.Property(d => d.JoinDate).IsRequired().HasDefaultValue(DateTime.Now);
+		builder.Property(d => d.JoinDate).IsRequired();
 
-		builder.Property(d => d.ContractEndDate).IsRequired().HasDefaultValue(DateTime.Now.AddMonths(6));
+		builder.Property(d => d.ContractEndDate).IsRequired();
 
 		builder.Property(d => d.LicenceNumber).IsRequired().IsUnicode(false).HasMaxLength(12);
 		builder.HasIndex(d => d.LicenceNumber).IsUnique();
@@ -34,6 +34,8 @@ public class DriverConfiguration : IEntityTypeConfiguration<Driver>
 
 		builder.Property(d => d.IsAvailable).IsRequired().HasDefaultValue(true);
 
+
+		//Configure a one-to-one relationstip in the Table Drivers between the "Id" and the "AlternativeDriverId" (self-join).
 		builder.HasOne(d => d.AlternativeDriver)
 			   .WithOne()
 			   .HasForeignKey<Driver>(d => d.AlternativeDriverId)

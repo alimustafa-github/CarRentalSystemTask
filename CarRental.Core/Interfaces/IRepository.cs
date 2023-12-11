@@ -19,7 +19,7 @@ public interface IRepository<T> where T : class
 	/// <param name="propertyName"></param>
 	/// <param name="value"></param>
 	/// <returns></returns>
-	Task<IEnumerable<T>> FilterTheRecords(string value, string propertyName);
+	Task<IEnumerable<T>> FilterTheRecords(string value, object propertyName, int pageNumber, int pageSize);
 
 
 	/// <summary>

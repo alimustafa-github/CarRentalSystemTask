@@ -20,50 +20,30 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 
 	public async Task<TEntity> DeleteAsync(object id)
 	{
-		try
+		if (id is null)
 		{
-			if (id is null)
-			{
-				throw new ArgumentNullException("The Identifier must not be null");
-			}
-			var entity = await GetByIdAsync(id);
-			if (!_context.Set<TEntity>().Local.Contains(entity))
-			{
-				throw new InvalidOperationException("Entity is not being tracked by the context.");
-			}
-			_context.Set<TEntity>().Remove(entity);
-			await _context.SaveChangesAsync();
+			throw new ArgumentNullException("The Identifier must not be null");
+		}
+		var entity = await GetByIdAsync(id);
+		if (!_context.Set<TEntity>().Local.Contains(entity))
+		{
+			throw new InvalidOperationException("Entity is not being tracked by the context.");
+		}
+		_context.Set<TEntity>().Remove(entity);
+		//await Task.Run(() => _context.Set<TEntity>().Remove(entity));
+		await _context.SaveChangesAsync();
 
-			return entity;
-
-		}
-		catch (DbUpdateException ex)
-		{
-			throw;
-		}
-		catch (Exception ex)
-		{
-			throw;
-		}
+		return entity;
 	}
 
 	public async Task<TEntity> GetByIdAsync(object id)
 	{
-		try
+		TEntity? entity = await _context.Set<TEntity>().FindAsync(id);
+		if (entity is null)
 		{
-			TEntity? entity = await _context.Set<TEntity>().FindAsync(id);
-			if (entity is null)
-			{
-				throw new ArgumentNullException("There is no Entity Corresponds with the give identifier");
-			}
-			return entity;
+			throw new ArgumentNullException("There is no Entity Corresponds with the give identifier");
 		}
-		catch (Exception)
-		{
-
-			throw;
-		}
-	
+		return entity;
 	}
 
 	public async Task<IEnumerable<TEntity>> GetAllAsync(int pageNumber, int pageSize)
@@ -80,22 +60,17 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 
 	public async Task<IEnumerable<TEntity>> GetFromCacheAsync(int pageNumber, int pageSize)
 	{
-		try
-		{
-			IEnumerable<TEntity> entities = _memoryCache.Get<IEnumerable<TEntity>>(pageNumber.ToString());
+		IEnumerable<TEntity>? entities = _memoryCache.Get<IEnumerable<TEntity>>(pageNumber.ToString());
 
-			if (entities is null)
-			{
-				entities = await GetAllAsync(pageNumber, pageSize);
-				//the data will stay in Cache for two minutes
-				_memoryCache.Set(pageNumber.ToString(), entities, TimeSpan.FromMinutes(2));
-			}
-			return entities;
-		}
-		catch (InvalidCastException ex)
+		//Task<IEnumerable<TEntity>?> entities = Task.Run(() => _memoryCache.Get<IEnumerable<TEntity>>(pageNumber.ToString()));
+
+		if (entities is null)
 		{
-			throw;
+			entities = await GetAllAsync(pageNumber, pageSize);
+			//the data will stay in Cache for two minutes
+			_memoryCache.Set(pageNumber.ToString(), entities, TimeSpan.FromMinutes(2));
 		}
+		return entities;
 	}
 
 
@@ -112,6 +87,7 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 			throw new InvalidOperationException("Entity is not being tracked by the context.");
 		}
 		_context.Entry(entity).State = EntityState.Modified;
+		//await Task.Run(() => _context.Entry(entity).State = EntityState.Modified);
 		await _context.SaveChangesAsync();
 		return entity;
 	}
@@ -170,27 +146,22 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 	/// <param name="propertyName"></param>
 	/// <param name="value"></param>
 	/// <returns></returns>
-	public async Task<IEnumerable<TEntity>> FilterTheRecords(string propertyName, string value)
+	public async Task<IEnumerable<TEntity>> FilterTheRecords(string propertyName, object value, int pageNumber, int pageSize)
 	{
-		// Get the property info for the specified property name
-		var propertyInfo = typeof(TEntity).GetProperty(propertyName);
-
-		// Create a parameter expression for the entity type
 		var parameter = Expression.Parameter(typeof(TEntity));
+		var propertyAccess = Expression.Property(parameter, propertyName);
 
-		// Convert the input value to a string
-		var stringValue = value.ToString();
+		// Convert the property to a string if it's not already
+		Expression convertedProperty = propertyAccess;
+		if (propertyAccess.Type != typeof(string))
+		{
+			var toStringMethod = typeof(object).GetMethod("ToString");
+			convertedProperty = Expression.Call(propertyAccess, toStringMethod);
+		}
 
-		// Create an expression representing accessing the specified property
-		var propertyAccess = Expression.Property(parameter, propertyInfo);
-
-		// Convert the property to a string using the ToString() method
-		var toStringMethod = typeof(object).GetMethod("ToString");
-		var toStringExpression = Expression.Call(propertyAccess, toStringMethod);
-
-		// Create an expression representing the 'Contains' operation on the string
+		// Create an expression representing the 'Contains' operation on the property
 		var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
-		var containsExpression = Expression.Call(toStringExpression, containsMethod, Expression.Constant(stringValue));
+		var containsExpression = Expression.Call(convertedProperty, containsMethod, Expression.Constant(value.ToString(), typeof(string)));
 
 		// Combine the property access and 'contains' expression into a lambda expression
 		var lambda = Expression.Lambda<Func<TEntity, bool>>(containsExpression, parameter);
@@ -198,7 +169,9 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 		// Use the lambda expression in a Where clause to filter the entities
 		var filteredEntities = await _context.Set<TEntity>().Where(lambda).ToListAsync();
 
-		return filteredEntities;
+		int recordsToSkip = (pageNumber - 1) * pageSize;
+
+		return filteredEntities.Skip(recordsToSkip).Take(pageSize);
 	}
 
 }

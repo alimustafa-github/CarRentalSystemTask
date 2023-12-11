@@ -39,9 +39,9 @@ public class CustomerService : ICustomerService
 
 	public async Task<CustomerDto> AddCustomerAsync(AddCustomerDto addCustomerDto)
 	{
-		if (addCustomerDto.LicenseNumber is not null)
+		if (addCustomerDto.LicenceNumber is not null)
 		{
-			var licenceNumberExists = await SearchForCustomerByLicenceNumberAsync(addCustomerDto.LicenseNumber);
+			var licenceNumberExists = await SearchForCustomerByLicenceNumberAsync(addCustomerDto.LicenceNumber);
 			if (licenceNumberExists is not null)
 			{
 				throw new DbUpdateException("the Licence Number you have entered already exsists");
@@ -70,7 +70,7 @@ public class CustomerService : ICustomerService
 
 	public async Task<CustomerDto> SearchForCustomerByLicenceNumberAsync(string licenceNumber)
 	{
-		string propertyName = "LicenseNumber";
+		string propertyName = "LicenceNumber";
 		Customer customer = await _customerRepository.SearchForEntityAsync(propertyName, licenceNumber);
 		CustomerDto customerDto = _mapper.Map<CustomerDto>(customer);
 

@@ -128,6 +128,17 @@ public class DriverService : IDriverService, INotificationHandler<RentedCarServi
 		return driverDto;
 	}
 
+
+	public async Task<IEnumerable<DriverDto>> FilterByLicenceNumberAsync(string value,int pageNumber, int pageSize)
+	{
+		string propertyName = "LicenceNumber";
+		IEnumerable<Driver> drivers = await _driverRepository.FilterTheRecords(propertyName, value,pageNumber,pageSize);
+		IEnumerable<DriverDto> driverDtos = _mapper.Map<IEnumerable<DriverDto>>(drivers);
+
+		return driverDtos;
+	}
+
+
 	public async Task Handle(RentedCarService.CarRentedEvent notification, CancellationToken cancellationToken)
 	{
 		Driver driver = await _driverRepository.GetByIdAsync(notification.DriverId);

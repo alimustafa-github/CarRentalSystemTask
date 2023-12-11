@@ -41,6 +41,20 @@ public class DriverController : ControllerBase
 	}
 
 
+	[HttpGet("filterdriversbyserialnumber/({value})")]
+	public async Task<ApiResponse<IEnumerable<DriverDto>>> FilterByLicenceNumber(string value, int pageNumber, int pageSize)
+	{
+		IEnumerable<DriverDto> driverDtos = await _driverService.FilterByLicenceNumberAsync(value,pageNumber,pageSize);
+
+		return new ApiResponse<IEnumerable<DriverDto>>
+		{
+			IsSuccess = true,
+			Data = driverDtos,
+			StatusCode = StatusCodes.Status200OK,
+			Message = string.Empty
+		};
+	}
+
 
 	[HttpGet("getdriverbyid/{id}")]
 	public async Task<ApiResponse<DriverDto>> GetDriverById(Guid id)

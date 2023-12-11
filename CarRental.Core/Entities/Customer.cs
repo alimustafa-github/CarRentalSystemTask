@@ -5,7 +5,7 @@ public class Customer : IEntityBase
 	public string UserId { get; set; }
 	public ApplicationUser User { get; set; }
 	public bool HasLicence { get; set; }
-	public string? LicenseNumber { get; set; }
+	public string? LicenceNumber { get; set; }
 	public DateTime? LicenseExpirationDate { get; set; }
 	public DateTime JoinDate { get; set; }
 	public Guid MembershipId { get; set; }

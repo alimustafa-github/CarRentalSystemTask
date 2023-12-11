@@ -4,7 +4,6 @@ public class CarService : ICarService, INotificationHandler<RentedCarService.Car
 {
 	private readonly EfCoreCarRepository _carRepository;
 	private readonly IMapper _mapper;
-	private readonly IMediator _mediator;
 	private readonly IUserService _userService;
 	private readonly IDriverService _driverService;
 
@@ -166,10 +165,10 @@ public class CarService : ICarService, INotificationHandler<RentedCarService.Car
 
 	}
 
-	public async Task<IEnumerable<CarDto>> FilterTheCarsBySerialNumber(string value)
+	public async Task<IEnumerable<CarDto>> FilterTheCarsBySerialNumber(string value, int pageNumber, int pageSize)
 	{
 		string propertyName = "SerialNumber";
-		IEnumerable<Car> cars = await _carRepository.FilterTheRecords(propertyName, value);
+		IEnumerable<Car> cars = await _carRepository.FilterTheRecords(propertyName, value,pageNumber,pageSize);
 		IEnumerable<CarDto> carDtos = _mapper.Map<IEnumerable<CarDto>>(cars);
 		return carDtos;
 	}
