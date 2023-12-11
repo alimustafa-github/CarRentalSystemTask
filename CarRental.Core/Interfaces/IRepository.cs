@@ -2,13 +2,14 @@
 public interface IRepository<T> where T : class
 {
 	Task<T> GetByIdAsync(object id);
-	Task<IEnumerable<T>> GetAllAsync(int pageNumber , int pageSize);
+	Task<IEnumerable<T>> GetAllAsync(int pageNumber, int pageSize);
+	IQueryable<T> GetQuery();
 	Task<T> AddAsync(T entity);
 	Task<T> UpdateAsync(T entity);
 	Task<T> DeleteAsync(object id);
 
-	Task<IEnumerable<T>> GetFromCacheAsync(int pageNumber,int pageSize);
-	Task<IEnumerable<T>> SortAsync(Func<T, IComparable> propertySelector , int pageNumber , int pageSize);
+	Task<IEnumerable<T>> GetFromCacheAsync(int pageNumber, int pageSize);
+	Task<IEnumerable<T>> SortAsync(Func<T, IComparable> propertySelector, int pageNumber, int pageSize);
 
 
 	/// <summary>
@@ -30,4 +31,10 @@ public interface IRepository<T> where T : class
 	/// <param name="propertyValue"></param>
 	/// <returns></returns>
 	Task<T> SearchForEntityAsync(string propertyName, object propertyValue);
+
+
+	IQueryable<T> ApplySearching(IQueryable<T> query, string searchProperty, object searchValue);
+
+	IQueryable<T> ApplySorting(IQueryable<T> query, string sortingProperty, bool ascending);
+
 }
