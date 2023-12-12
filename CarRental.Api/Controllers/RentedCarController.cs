@@ -10,33 +10,24 @@ public class RentedCarController : ControllerBase
 		_rentedCarService = rentedCarService;
 	}
 
-	[HttpGet("getrentedcarsfromcache/{pageNumber}/{pageSize}")]
-	public async Task<ApiResponse<IEnumerable<RentedCarDto>>> GetAllRentedCarsFromCache(int pageNumber, int pageSize = 15)
+
+	[HttpPost("getrentedcarslist")]
+	public async Task<ApiResponse<IEnumerable<RentedCarDto>>> GetAllRentedCars([FromBody] DataRequestDto input)
 	{
-		IEnumerable<RentedCarDto> rentedCarDtos = await _rentedCarService.GetRentedCarsFromChacheAsync(pageNumber, pageSize);
+		var result = await _rentedCarService.GetRentedCarsAsync(input);
+		IEnumerable<RentedCarDto> rentedCarDtos = result.Item1;
+		int totalCount = result.Item2;
+
 		return new ApiResponse<IEnumerable<RentedCarDto>>
 		{
-			StatusCode = StatusCodes.Status200OK,
+			TotalCount = totalCount,
 			IsSuccess = true,
 			Data = rentedCarDtos,
+			StatusCode = StatusCodes.Status200OK,
 			Message = string.Empty
 		};
 	}
 
-
-	[HttpGet("getrentedcars/{pageNumber}/{pagesize}")]
-	public async Task<ApiResponse<IEnumerable<RentedCarDto>>> GetAllRentedCars(int pageNumber, int pagesize = 15)
-	{
-		IEnumerable<RentedCarDto> rentedCarDtos = await _rentedCarService.GetRentedCarsAsync(pageNumber, pagesize);
-
-		return new ApiResponse<IEnumerable<RentedCarDto>>
-		{
-			StatusCode = StatusCodes.Status200OK,
-			IsSuccess = true,
-			Data = rentedCarDtos,
-			Message = string.Empty
-		};
-	}
 
 
 
@@ -85,11 +76,11 @@ public class RentedCarController : ControllerBase
 	[HttpDelete("deleterentedcarbyid/{id}")]
 	public async Task<ApiResponse<RentedCarDto>> DeleteRentedCar(Guid id)
 	{
-		RentedCarDto rentedCarDto = await _rentedCarService.DeleteRentedCarByIdAsync(id);
+		await _rentedCarService.DeleteRentedCarByIdAsync(id);
 		return new ApiResponse<RentedCarDto>
 		{
 			IsSuccess = true,
-			Data = rentedCarDto,
+			Data = null,
 			StatusCode = StatusCodes.Status204NoContent,
 			Message = "Car Deleted Successfully"
 		};

@@ -3,9 +3,9 @@ public interface ICarService
 {
 
 	Task<CarDto> AddCarAsync(AddCarDto carDto);
-	Task<CarDto> DeleteCarAsync(object id);
+	Task DeleteCarAsync(object id);
 	//Task<IQueryable<CarDto>> GetCarsFromCacheAsync();
-	Task<(IEnumerable<CarDto>,int)> GetCarsWithSortingAndFiltering(CarRequestDto input);
+	Task<(IEnumerable<CarDto>,int)> GetCarsAsync(DataRequestDto input);
 
 	//Task<CarDto> SearchForCarBySerialNumberAsync(int serialNumber);
 	//Task<IEnumerable<CarDto>> SortCarsBySerialNumber(int pageNumber, int pageSize);

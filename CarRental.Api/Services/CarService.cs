@@ -2,21 +2,19 @@
 
 public class CarService : ICarService, INotificationHandler<RentedCarService.CarRentedEvent>
 {
-	private readonly EfCoreCarRepository _carRepository;
 	private readonly IMapper _mapper;
-	private readonly IUserService _userService;
-	private readonly IDriverService _driverService;
+	private readonly EfCoreCarRepository _carRepository;
 
-	public CarService(EfCoreCarRepository carRepository, IMapper mapper, IUserService userService, IDriverService driverService)
+
+	public CarService(IMapper mapper, EfCoreCarRepository carRepository)
 	{
-		_carRepository = carRepository;
+
 		_mapper = mapper;
-		_userService = userService;
-		_driverService = driverService;
+		_carRepository = carRepository;
 	}
 
 
-	public async Task<(IEnumerable<CarDto>, int)> GetCarsWithSortingAndFiltering(CarRequestDto input)
+	public async Task<(IEnumerable<CarDto>, int)> GetCarsAsync(DataRequestDto input)
 	{
 		IQueryable<Car> query = _carRepository.GetQuery();
 
@@ -31,9 +29,9 @@ public class CarService : ICarService, INotificationHandler<RentedCarService.Car
 
 		query = query.Skip(recordsToSkip).Take(input.PageSize);
 
-		if (!string.IsNullOrWhiteSpace(input.SortingProperty))
+		if (!string.IsNullOrWhiteSpace(input.SortProperty))
 		{
-			query = _carRepository.ApplySorting(query, input.SortingProperty, input.Ascending);
+			query = _carRepository.ApplySorting(query, input.SortProperty, input.Ascending);
 		}
 
 		IEnumerable<Car> cars = await query.ToListAsync();
@@ -102,15 +100,9 @@ public class CarService : ICarService, INotificationHandler<RentedCarService.Car
 		return carDto;
 	}
 
-	public async Task<CarDto> DeleteCarAsync(object id)
+	public async Task DeleteCarAsync(object id)
 	{
-		Car car = await _carRepository.DeleteAsync(id);
-		CarDto carDto = _mapper.Map<CarDto>(car);
-		if (carDto is null)
-		{
-			throw new ArgumentNullException("The car was successfully deleted but there was an error while mapping");
-		}
-		return carDto;
+		await _carRepository.DeleteAsync(id);
 	}
 
 	private async Task<CarDto> SearchForCarBySerialNumberAsync(int serialNumber)

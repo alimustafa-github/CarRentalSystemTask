@@ -61,11 +61,11 @@ public class CarController : ControllerBase
 	[HttpDelete("deletecarbyid/{id}")]
 	public async Task<ApiResponse<CarDto>> DeleteCar(object id)
 	{
-		CarDto carDto = await _carService.DeleteCarAsync(id);
+		await _carService.DeleteCarAsync(id);
 		return new ApiResponse<CarDto>
 		{
 			IsSuccess = true,
-			Data = carDto,
+			Data = null,
 			StatusCode = StatusCodes.Status204NoContent,
 			Message = "Car Deleted Successfully"
 		};
@@ -75,9 +75,9 @@ public class CarController : ControllerBase
 
 
 	[HttpPost("getcarslist")]
-	public async Task<ApiResponse<IEnumerable<CarDto>>> GetCarsWithSortingAndPagination([FromBody] CarRequestDto input)
+	public async Task<ApiResponse<IEnumerable<CarDto>>> GetCars([FromBody] DataRequestDto input)
 	{
-		var result = await _carService.GetCarsWithSortingAndFiltering(input);
+		var result = await _carService.GetCarsAsync(input);
 		IEnumerable<CarDto> carDtos = result.Item1;
 		int Count = result.Item2;
 

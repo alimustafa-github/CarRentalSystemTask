@@ -26,13 +26,16 @@ public class DriverController : ControllerBase
 
 
 
-	[HttpGet("getdrivers/{pageNumber}/{pageSize}")]
-	public async Task<ApiResponse<IEnumerable<DriverDto>>> GetAllDrivers(int pageNumber, int pageSize = 15)
+	[HttpPost("getdriverslist")]
+	public async Task<ApiResponse<IEnumerable<DriverDto>>> GetAllDrivers([FromBody] DataRequestDto driverRequestDto)
 	{
-		IEnumerable<DriverDto> driverDtos = await _driverService.GetDriversAsync(pageNumber, pageSize);
+		var result = await _driverService.GetDriversAsync(driverRequestDto);
+		IEnumerable<DriverDto> driverDtos = result.Item1;
+		int totalCount = result.Item2;
 
 		return new ApiResponse<IEnumerable<DriverDto>>
 		{
+			TotalCount = totalCount,
 			IsSuccess = true,
 			Data = driverDtos,
 			StatusCode = StatusCodes.Status200OK,
@@ -41,19 +44,7 @@ public class DriverController : ControllerBase
 	}
 
 
-	[HttpGet("filterdriversbyserialnumber/({value})")]
-	public async Task<ApiResponse<IEnumerable<DriverDto>>> FilterByLicenceNumber(string value, int pageNumber, int pageSize)
-	{
-		IEnumerable<DriverDto> driverDtos = await _driverService.FilterByLicenceNumberAsync(value,pageNumber,pageSize);
 
-		return new ApiResponse<IEnumerable<DriverDto>>
-		{
-			IsSuccess = true,
-			Data = driverDtos,
-			StatusCode = StatusCodes.Status200OK,
-			Message = string.Empty
-		};
-	}
 
 
 	[HttpGet("getdriverbyid/{id}")]
@@ -73,59 +64,18 @@ public class DriverController : ControllerBase
 	[HttpDelete("deletedriver/{id}")]
 	public async Task<ApiResponse<DriverDto>> DeleteDriverById(Guid id)
 	{
-		DriverDto driverDto = await _driverService.DeleteDriverAsync(id);
+	       await _driverService.DeleteDriverAsync(id);
 
 		return new ApiResponse<DriverDto>
 		{
 			IsSuccess = true,
-			Data = driverDto,
+			Data = null,
 			StatusCode = StatusCodes.Status204NoContent,
 			Message = string.Empty
 		};
 	}
 
 
-
-	[HttpGet("sortdriversbyid/{pageNumber}/{pageSize}")]
-	public async Task<ApiResponse<IEnumerable<DriverDto>>> SortDriversById(int pageNumber, int pageSize = 15)
-	{
-		IEnumerable<DriverDto> driverDtos = await _driverService.SortDriversById(pageNumber, pageSize);
-
-		return new ApiResponse<IEnumerable<DriverDto>>
-		{
-			IsSuccess = true,
-			Data = driverDtos,
-			StatusCode = StatusCodes.Status200OK,
-			Message = string.Empty
-		};
-	}
-
-
-	[HttpGet("searchfordriver/{licenceNumber}")]
-	public async Task<ApiResponse<DriverDto>> SearchForDriverByLicenceNumber(string licenceNumber)
-	{
-		DriverDto driverDto = await _driverService.SearchForDriverByLicenceNumberAsync(licenceNumber);
-		if (driverDto is not null)
-		{
-			return new ApiResponse<DriverDto>
-			{
-				IsSuccess = true,
-				Data = driverDto,
-				StatusCode = StatusCodes.Status200OK,
-				Message = string.Empty
-			};
-		}
-		else
-		{
-			return new ApiResponse<DriverDto>()
-			{
-				IsSuccess = false,
-				Data = null,
-				StatusCode = StatusCodes.Status404NotFound,
-				Message = "there is no driver corresponds with the entered LicenceNumber"
-			};
-		}
-	}
 
 
 

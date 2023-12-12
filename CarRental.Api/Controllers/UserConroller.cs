@@ -90,28 +90,14 @@ public class UserConroller : ControllerBase
 	[HttpDelete("deleteuser/{id}")]
 	public async Task<ApiResponse<ApplicationUserDto>> DeleteUser(string id)
 	{
-		ApplicationUserDto userDto = await _authService.DeleteUserAsync(id);
-		if (userDto is not null)
+		await _authService.DeleteUserAsync(id);
+		return new ApiResponse<ApplicationUserDto>()
 		{
-			return new ApiResponse<ApplicationUserDto>()
-			{
-				IsSuccess = true,
-				Data = userDto,
-				StatusCode = StatusCodes.Status204NoContent,
-				Message = string.Empty
-			};
-		}
-		else
-		{
-			//todo : get back and fix this issue
-			return new ApiResponse<ApplicationUserDto>()
-			{
-				IsSuccess = false,
-				Data = null,
-				StatusCode = StatusCodes.Status400BadRequest,
-				Message = "Failed to update"
-			};
-		}
+			IsSuccess = true,
+			Data = null,
+			StatusCode = StatusCodes.Status204NoContent,
+			Message = string.Empty
+		};
 	}
 
 

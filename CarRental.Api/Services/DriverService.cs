@@ -37,7 +37,7 @@ public class DriverService : IDriverService, INotificationHandler<RentedCarServi
 		}
 
 		driver.UserId = driver.User.Id;
-		driver.User.IsDriver = true;       
+		driver.User.IsDriver = true;
 
 		await _driverRepository.AddAsync(driver);
 		DriverDto driverDto = _mapper.Map<DriverDto>(driver);
@@ -49,40 +49,33 @@ public class DriverService : IDriverService, INotificationHandler<RentedCarServi
 
 	}
 
-	public async Task<DriverDto> DeleteDriverAsync(object id)
+	public async Task DeleteDriverAsync(object id)
 	{
-		Driver driver = await _driverRepository.DeleteAsync(id);
-		DriverDto driverDto = _mapper.Map<DriverDto>(driver);
-
-		if (driverDto is null)
-		{
-			throw new ArgumentNullException("The driver was deleted but there was error while mapping");
-		}
-		return driverDto;
+		await _driverRepository.DeleteAsync(id);
 	}
 
-	public async Task<IEnumerable<DriverDto>> GetDriversFromCacheAsync(int pageNumber, int pageSize)
+	public async Task<(IEnumerable<DriverDto>, int)> GetDriversAsync(DataRequestDto input)
 	{
-		IEnumerable<Driver> drivers = await _driverRepository.GetFromCacheAsync(pageNumber, pageSize);
-		IEnumerable<DriverDto> driverDtos = _mapper.Map<IEnumerable<DriverDto>>(drivers);
-
-		if (driverDtos is null)
+		IQueryable<Driver> query = _driverRepository.GetQuery();
+		if (!string.IsNullOrEmpty(input.SearchProperty) && !string.IsNullOrEmpty(input.SearchValue))
 		{
-			throw new ArgumentNullException("Mapping Failed");
+			query = _driverRepository.ApplySearching(query, input.SearchProperty, input.SearchValue);
 		}
-		return driverDtos;
-	}
-	public async Task<IEnumerable<DriverDto>> GetDriversAsync(int pageNumber, int pageSize)
-	{
-		IEnumerable<Driver> drivers = await _driverRepository.GetAllAsync(pageNumber, pageSize);
-		IEnumerable<ApplicationUserDto> userDtos = await _userService.GetAllUsersAsync();
-		IEnumerable<DriverDto> driverDtos = _mapper.Map<IEnumerable<DriverDto>>(drivers);
 
-		if (driverDtos is null)
+		int totalCount = await query.CountAsync();
+
+		int recordsToSkip = (input.PageNumber - 1) * input.PageSize;
+
+		query = query.Skip(recordsToSkip).Take(input.PageSize);
+
+		if (!string.IsNullOrWhiteSpace(input.SortProperty))
 		{
-			throw new ArgumentNullException("Mapping Failed");
+			query = _driverRepository.ApplySorting(query, input.SortProperty, input.Ascending);
 		}
-		return driverDtos;
+		IEnumerable<Driver> drivers = await query.ToListAsync();
+		IEnumerable<DriverDto> driverDtos = _mapper.Map<IEnumerable<DriverDto>>(drivers);
+		return (driverDtos, totalCount);
+
 	}
 
 	public async Task<DriverDto> GetDriverByIdAsync(object id)
@@ -102,7 +95,7 @@ public class DriverService : IDriverService, INotificationHandler<RentedCarServi
 		return driverDto;
 	}
 
-	public async Task<DriverDto> SearchForDriverByLicenceNumberAsync(string licenceNumber)
+	private async Task<DriverDto> SearchForDriverByLicenceNumberAsync(string licenceNumber)
 	{
 		string propertyName = "LicenceNumber";
 		Driver driver = await _driverRepository.SearchForEntityAsync(propertyName, licenceNumber);
@@ -111,31 +104,14 @@ public class DriverService : IDriverService, INotificationHandler<RentedCarServi
 		return driverDto;
 	}
 
-	public async Task<IEnumerable<DriverDto>> SortDriversById(int pageNumber, int pageSize)
-	{
-		IEnumerable<Driver> drivers = await _driverRepository.SortAsync(d => d.Id, pageNumber, pageSize);
 
-
-		return _mapper.Map<IEnumerable<DriverDto>>(drivers);
-	}
-
-	public async Task<DriverDto> SearchForDriverByAlternativeDriverIdAsync(Guid? altDriverId)
+	private async Task<DriverDto> SearchForDriverByAlternativeDriverIdAsync(Guid? altDriverId)
 	{
 		string propertyName = "AlternativeDriverId";
 		Driver driver = await _driverRepository.SearchForEntityAsync(propertyName, altDriverId);
 		DriverDto driverDto = _mapper.Map<DriverDto>(driver);
 
 		return driverDto;
-	}
-
-
-	public async Task<IEnumerable<DriverDto>> FilterByLicenceNumberAsync(string value,int pageNumber, int pageSize)
-	{
-		string propertyName = "LicenceNumber";
-		IEnumerable<Driver> drivers = await _driverRepository.FilterTheRecords(propertyName, value,pageNumber,pageSize);
-		IEnumerable<DriverDto> driverDtos = _mapper.Map<IEnumerable<DriverDto>>(drivers);
-
-		return driverDtos;
 	}
 
 

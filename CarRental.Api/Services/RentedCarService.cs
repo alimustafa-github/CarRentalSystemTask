@@ -36,13 +36,11 @@ public class RentedCarService : IRentedCarService
 		return rentedCarDto;
 	}
 
-	public async Task<RentedCarDto> DeleteRentedCarByIdAsync(object id)
+	public async Task DeleteRentedCarByIdAsync(object id)
 	{
 		RentedCar rentedCar = await _rentedCarRepository.GetByIdAsync(id);
-		rentedCar = await _rentedCarRepository.DeleteAsync(id);
+		await _rentedCarRepository.DeleteAsync(id);
 		await _mediator.Publish(new CarRentedEvent { DriverId = rentedCar.DriverId, CarId = rentedCar.CarId, Cancellation = true });
-		RentedCarDto rentedCarDto = _mapper.Map<RentedCarDto>(rentedCar);
-		return rentedCarDto;
 	}
 
 	public async Task<RentedCarDto> GetRentedCarByIdAsync(object id)
@@ -52,18 +50,29 @@ public class RentedCarService : IRentedCarService
 		return rentedCarDto;
 	}
 
-	public async Task<IEnumerable<RentedCarDto>> GetRentedCarsAsync(int pageNumber, int pageSize)
+	public async Task<(IEnumerable<RentedCarDto>, int)> GetRentedCarsAsync(DataRequestDto input)
 	{
-		IEnumerable<RentedCar> rentedCars = await _rentedCarRepository.GetAllAsync(pageNumber, pageSize);
-		IEnumerable<RentedCarDto> rentedCarDtos = _mapper.Map<IEnumerable<RentedCarDto>>(rentedCars);
-		return rentedCarDtos;
+		IQueryable<RentedCar> query = _rentedCarRepository.GetQuery();
+		if (!string.IsNullOrEmpty(input.SearchProperty) && !string.IsNullOrEmpty(input.SearchValue))
+		{
+			query = _rentedCarRepository.ApplySearching(query, input.SearchProperty, input.SearchValue);
+		}
+
+		int totalCount = await query.CountAsync();
+
+		int recordsToSkip = (input.PageNumber - 1) * input.PageSize;
+
+		query = query.Skip(recordsToSkip).Take(input.PageSize);
+
+		if (!string.IsNullOrWhiteSpace(input.SortProperty))
+		{
+			query = _rentedCarRepository.ApplySorting(query, input.SortProperty, input.Ascending);
+		}
+		IEnumerable<RentedCar> customers = await query.ToListAsync();
+		IEnumerable<RentedCarDto> customerDtos = _mapper.Map<IEnumerable<RentedCarDto>>(customers);
+		return (customerDtos, totalCount);
 	}
-	public async Task<IEnumerable<RentedCarDto>> GetRentedCarsFromChacheAsync(int pageNumber, int pageSize)
-	{
-		IEnumerable<RentedCar> rentedCars = await _rentedCarRepository.GetFromCacheAsync(pageNumber, pageSize);
-		IEnumerable<RentedCarDto> rentedCarDtos = _mapper.Map<IEnumerable<RentedCarDto>>(rentedCars);
-		return rentedCarDtos;
-	}
+
 
 	public async Task<RentedCarDto> UpdateRentedCarAsync(object id, UpdateRentedCarDto updateRentedCarDto)
 	{
@@ -96,7 +105,7 @@ public class RentedCarService : IRentedCarService
 		RentedCarDto rentedCarDto = _mapper.Map<RentedCarDto>(rentedCar);
 		return rentedCarDto;
 	}
-	public async Task<RentedCarDto> SearchForRentedCarByDriverIdAsync(Guid? driverId)
+	private async Task<RentedCarDto> SearchForRentedCarByDriverIdAsync(Guid? driverId)
 	{
 		if (driverId is null)
 		{
@@ -107,13 +116,14 @@ public class RentedCarService : IRentedCarService
 		RentedCarDto carDto = _mapper.Map<RentedCarDto>(car);
 		return carDto;
 	}
-	public async Task<RentedCarDto> SearchForRentedCarByCarIdAsync(Guid? carId)
+	private async Task<RentedCarDto> SearchForRentedCarByCarIdAsync(Guid? carId)
 	{
 		string propertyName = "CarId";
 		RentedCar car = await _rentedCarRepository.SearchForEntityAsync(propertyName, carId);
 		RentedCarDto carDto = _mapper.Map<RentedCarDto>(car);
 		return carDto;
 	}
+
 
 
 	public class CarRentedEvent : INotification

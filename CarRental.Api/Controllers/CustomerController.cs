@@ -26,13 +26,16 @@ public class CustomerController : ControllerBase
 
 
 
-	[HttpGet("getcustomers/{pageNumber}/{pageSize}")]
-	public async Task<ApiResponse<IEnumerable<CustomerDto>>> GetCustomers(int pageNumber, int pageSize = 15)
+	[HttpPost("getcustomerslist")]
+	public async Task<ApiResponse<IEnumerable<CustomerDto>>> GetAllCustomers([FromBody] DataRequestDto input)
 	{
-		IEnumerable<CustomerDto> customerDtos = await _customerService.GetCustomersAsync(pageNumber, pageSize);
+		var result = await _customerService.GetCustomersAsync(input);
+		IEnumerable<CustomerDto> customerDtos = result.Item1;
+		int totalCount = result.Item2;
 
 		return new ApiResponse<IEnumerable<CustomerDto>>
 		{
+			TotalCount = totalCount,
 			IsSuccess = true,
 			Data = customerDtos,
 			StatusCode = StatusCodes.Status200OK,
@@ -59,12 +62,12 @@ public class CustomerController : ControllerBase
 	[HttpDelete("deletecustomer/{id}")]
 	public async Task<ApiResponse<CustomerDto>> DeleteCustomerById(Guid id)
 	{
-		CustomerDto customerDto = await _customerService.DeleteCustomerAsync(id);
+		await _customerService.DeleteCustomerAsync(id);
 
 		return new ApiResponse<CustomerDto>
 		{
 			IsSuccess = true,
-			Data = customerDto,
+			Data = null,
 			StatusCode = StatusCodes.Status204NoContent,
 			Message = string.Empty
 		};
@@ -72,45 +75,7 @@ public class CustomerController : ControllerBase
 
 
 
-	[HttpGet("sortcustomersbyid/{pageNumber}/{pageSize}")]
-	public async Task<ApiResponse<IEnumerable<CustomerDto>>> SortCustomersById(int pageNumber, int pageSize = 15)
-	{
-		IEnumerable<CustomerDto> customerDtos = await _customerService.SortCustomersById(pageNumber, pageSize);
-
-		return new ApiResponse<IEnumerable<CustomerDto>>
-		{
-			IsSuccess = true,
-			Data = customerDtos,
-			StatusCode = StatusCodes.Status200OK,
-			Message = string.Empty
-		};
-	}
 
 
-	[HttpGet("searchforcustomer/{licenceNumber}")]
-	public async Task<ApiResponse<CustomerDto>> SearchForCustomerrByLicenceNumber(string licenceNumber)
-	{
-		CustomerDto customerDto = await _customerService.SearchForCustomerByLicenceNumberAsync(licenceNumber);
-		if (customerDto is not null)
-		{
-			return new ApiResponse<CustomerDto>
-			{
-				IsSuccess = true,
-				Data = customerDto,
-				StatusCode = StatusCodes.Status200OK,
-				Message = string.Empty
-			};
-		}
-		else
-		{
-			return new ApiResponse<CustomerDto>()
-			{
-				IsSuccess = false,
-				Data = null,
-				StatusCode = StatusCodes.Status404NotFound,
-				Message = "there is no customer corresponds with the entered LicenceNumber"
-			};
-		}
-	}
 
 }

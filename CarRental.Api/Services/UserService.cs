@@ -55,7 +55,7 @@ public class UserService : IUserService
 		}
 	}
 
-	public async Task<bool> AssignRoleAsync(string email, string roleName)
+	private async Task<bool> AssignRoleAsync(string email, string roleName)
 	{
 		var user = await _userManager.FindByEmailAsync(email);
 		if (user != null)
@@ -87,25 +87,16 @@ public class UserService : IUserService
 	}
 
 
-	public async Task<ApplicationUserDto> DeleteUserAsync(string id)
+	public async Task DeleteUserAsync(string id)
 	{
 		ApplicationUser user = await _userManager.FindByIdAsync(id);
 		var result = await _userManager.DeleteAsync(user);
-		ApplicationUserDto userDto = _mapper.Map<ApplicationUserDto>(user);
-		if (result.Succeeded)
-		{
-			return userDto;
-		}
-		else
-		{
-			return null;
-		}
 	}
 
 
 	public async Task<IEnumerable<ApplicationUserDto>> GetAllUsersAsync()
 	{
-		IEnumerable<ApplicationUser> users = await _userManager.Users.ToListAsync();
+		IQueryable<ApplicationUser> users = _userManager.Users;
 		if (users is null)
 		{
 			throw new ArgumentNullException();

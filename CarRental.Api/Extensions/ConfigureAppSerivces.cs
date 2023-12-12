@@ -1,4 +1,7 @@
-﻿namespace CarRental.Api.Extensions;
+﻿using CarRental.Core.Interfaces;
+using System.Xml;
+
+namespace CarRental.Api.Extensions;
 
 public static class ConfigureAppSerivces
 {

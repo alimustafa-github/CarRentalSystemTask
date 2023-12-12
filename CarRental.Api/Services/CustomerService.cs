@@ -11,15 +11,27 @@ public class CustomerService : ICustomerService
 		_mapper = mapper;
 	}
 
-	public async Task<IEnumerable<CustomerDto>> GetCustomersFromCacheAsync(int pageNumber, int pageSize)
+	public async Task<(IEnumerable<CustomerDto>, int)> GetCustomersAsync(DataRequestDto input)
 	{
-		IEnumerable<Customer> customers = await _customerRepository.GetFromCacheAsync(pageNumber, pageSize);
-		return _mapper.Map<IEnumerable<CustomerDto>>(customers);
-	}
-	public async Task<IEnumerable<CustomerDto>> GetCustomersAsync(int pageNumber, int pageSize)
-	{
-		IEnumerable<Customer> customers = await _customerRepository.GetAllAsync(pageNumber, pageSize);
-		return _mapper.Map<IEnumerable<CustomerDto>>(customers);
+		IQueryable<Customer> query = _customerRepository.GetQuery();
+		if (!string.IsNullOrEmpty(input.SearchProperty) && !string.IsNullOrEmpty(input.SearchValue))
+		{
+			query = _customerRepository.ApplySearching(query, input.SearchProperty, input.SearchValue);
+		}
+
+		int totalCount = await query.CountAsync();
+
+		int recordsToSkip = (input.PageNumber - 1) * input.PageSize;
+
+		query = query.Skip(recordsToSkip).Take(input.PageSize);
+
+		if (!string.IsNullOrWhiteSpace(input.SortProperty))
+		{
+			query = _customerRepository.ApplySorting(query, input.SortProperty, input.Ascending);
+		}
+		IEnumerable<Customer> customers = await query.ToListAsync();
+		IEnumerable<CustomerDto> customerDtos = _mapper.Map<IEnumerable<CustomerDto>>(customers);
+		return (customerDtos, totalCount);
 	}
 
 	public async Task<CustomerDto> GetCustomerByIdAsync(object id)
@@ -30,11 +42,9 @@ public class CustomerService : ICustomerService
 	}
 
 
-	public async Task<CustomerDto> DeleteCustomerAsync(object id)
+	public async Task DeleteCustomerAsync(object id)
 	{
-		Customer customer = await _customerRepository.DeleteAsync(id);
-		CustomerDto customerDto = _mapper.Map<CustomerDto>(customer);
-		return customerDto;
+		await _customerRepository.DeleteAsync(id);
 	}
 
 	public async Task<CustomerDto> AddCustomerAsync(AddCustomerDto addCustomerDto)
@@ -47,7 +57,7 @@ public class CustomerService : ICustomerService
 				throw new DbUpdateException("the Licence Number you have entered already exsists");
 			}
 		}
-		
+
 		Customer customer = _mapper.Map<Customer>(addCustomerDto);
 		if (customer is null || customer.User is null)
 		{
@@ -66,9 +76,7 @@ public class CustomerService : ICustomerService
 
 
 
-
-
-	public async Task<CustomerDto> SearchForCustomerByLicenceNumberAsync(string licenceNumber)
+	private async Task<CustomerDto> SearchForCustomerByLicenceNumberAsync(string licenceNumber)
 	{
 		string propertyName = "LicenceNumber";
 		Customer customer = await _customerRepository.SearchForEntityAsync(propertyName, licenceNumber);
@@ -77,11 +85,5 @@ public class CustomerService : ICustomerService
 		return customerDto;
 	}
 
-	public async Task<IEnumerable<CustomerDto>> SortCustomersById(int pageNumber, int pageSize)
-	{
-		IEnumerable<Customer> customers = await _customerRepository.SortAsync(d => d.Id, pageNumber, pageSize);
 
-
-		return _mapper.Map<IEnumerable<CustomerDto>>(customers);
-	}
 }
