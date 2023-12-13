@@ -11,6 +11,4 @@ public record CarDto
 	public Color Color { get; set; }
 	public decimal EngineCapacity { get; set; }
 	public bool IsRented { get; set; }
-    public Guid DriverId { get; set; }
-    public DriverDto Driver { get; set; }
 }

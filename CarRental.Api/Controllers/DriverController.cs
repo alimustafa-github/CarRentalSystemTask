@@ -1,5 +1,5 @@
 ﻿namespace CarRental.Api.Controllers;
-[Route("api/[controller]")]
+[Route("api/driver")]
 [ApiController]
 public class DriverController : ControllerBase
 {

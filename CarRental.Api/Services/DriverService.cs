@@ -2,13 +2,11 @@
 
 public class DriverService : IDriverService, INotificationHandler<RentedCarService.CarRentedEvent>
 {
-	private readonly IUserService _userService;
 	private readonly EfCoreDriverRepository _driverRepository;
 	private readonly IMapper _mapper;
 
-	public DriverService(IUserService userService, EfCoreDriverRepository driverRepository, IMapper mapper)
+	public DriverService(EfCoreDriverRepository driverRepository, IMapper mapper)
 	{
-		_userService = userService;
 		_driverRepository = driverRepository;
 		_mapper = mapper;
 	}
@@ -67,7 +65,6 @@ public class DriverService : IDriverService, INotificationHandler<RentedCarServi
 		int recordsToSkip = (input.PageNumber - 1) * input.PageSize;
 
 		query = query.Skip(recordsToSkip).Take(input.PageSize);
-
 		if (!string.IsNullOrWhiteSpace(input.SortProperty))
 		{
 			query = _driverRepository.ApplySorting(query, input.SortProperty, input.Ascending);
@@ -124,4 +121,6 @@ public class DriverService : IDriverService, INotificationHandler<RentedCarServi
 			await _driverRepository.UpdateAsync(driver);
 		}
 	}
+
+
 }

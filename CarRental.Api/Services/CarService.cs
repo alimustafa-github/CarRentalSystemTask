@@ -4,11 +4,8 @@ public class CarService : ICarService, INotificationHandler<RentedCarService.Car
 {
 	private readonly IMapper _mapper;
 	private readonly EfCoreCarRepository _carRepository;
-
-
 	public CarService(IMapper mapper, EfCoreCarRepository carRepository)
 	{
-
 		_mapper = mapper;
 		_carRepository = carRepository;
 	}
@@ -17,6 +14,7 @@ public class CarService : ICarService, INotificationHandler<RentedCarService.Car
 	public async Task<(IEnumerable<CarDto>, int)> GetCarsAsync(DataRequestDto input)
 	{
 		IQueryable<Car> query = _carRepository.GetQuery();
+	
 
 		if (!string.IsNullOrEmpty(input.SearchProperty) && !string.IsNullOrEmpty(input.SearchValue))
 		{
@@ -53,14 +51,9 @@ public class CarService : ICarService, INotificationHandler<RentedCarService.Car
 	public async Task<CarDto> AddCarAsync(AddCarDto addCarDto)
 	{
 		var serialNumberIsExists = await SearchForCarBySerialNumberAsync(addCarDto.SerialNumber);
-		var driverIdIsExists = await SearchForCarByDriverIdAsync(addCarDto.DriverId);
 		if (serialNumberIsExists is not null)
 		{
 			throw new DbUpdateException("SerialNumber you have entered already exist");
-		}
-		if (driverIdIsExists is not null)
-		{
-			throw new DbUpdateException("Driver ID you have entered already exist");
 		}
 		if (addCarDto is null)
 		{
@@ -81,15 +74,6 @@ public class CarService : ICarService, INotificationHandler<RentedCarService.Car
 	{
 
 		Car car = await _carRepository.GetByIdAsync(carId);
-		if (car.DriverId != updateCarDto.DriverId)
-		{
-			var driverIdExists = await SearchForCarByDriverIdAsync(updateCarDto.DriverId);
-			if (driverIdExists is not null)
-			{
-				throw new DbUpdateException("the driver you have selected is already taken by another car");
-			}
-
-		}
 		car = _mapper.Map(updateCarDto, car);
 		car = await _carRepository.UpdateAsync(car);
 		CarDto carDto = _mapper.Map<CarDto>(car);
@@ -109,14 +93,6 @@ public class CarService : ICarService, INotificationHandler<RentedCarService.Car
 	{
 		string propertyName = "SerialNumber";
 		Car car = await _carRepository.SearchForEntityAsync(propertyName, serialNumber.ToString());
-		CarDto carDto = _mapper.Map<CarDto>(car);
-		return carDto;
-	}
-	private async Task<CarDto> SearchForCarByDriverIdAsync(Guid? driverId)
-	{
-		IQueryable<Car> carsQuery = _carRepository.GetQuery();
-		var car = await carsQuery.FirstOrDefaultAsync(car => car.DriverId == driverId);
-
 		CarDto carDto = _mapper.Map<CarDto>(car);
 		return carDto;
 	}

@@ -11,7 +11,6 @@ public record CustomerDto
 	public DateTime JoinDate { get; set; }
 	public Guid MembershipId { get; set; }
 	public int CurrentlyRentedCarsCount { get; set; }
-	public ICollection<RentedCarDto> RentedCars { get; set; }
 
 
 }

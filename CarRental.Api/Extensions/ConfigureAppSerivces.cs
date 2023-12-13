@@ -1,12 +1,28 @@
-﻿using CarRental.Core.Interfaces;
-using System.Xml;
-
-namespace CarRental.Api.Extensions;
+﻿namespace CarRental.Api.Extensions;
 
 public static class ConfigureAppSerivces
 {
 	public static void RegisterAppServices(this WebApplicationBuilder builder)
 	{
+		//Configure the program to work with sql database
+		string? connectionString = builder.Configuration.GetConnectionString("MyConnection");
+		if (connectionString is not null)
+		{
+			builder.Services.AddDbContext<ApplicationDbContext>(options =>
+			{
+				options.UseLazyLoadingProxies();
+				options.UseSqlServer(connectionString);
+				options.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()));
+				options.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Information)));
+			});
+		}
+		else
+		{
+			throw new InvalidOperationException("Connection string is null or not found");
+		}
+
+
+
 		//Register our Custom serivces here
 		builder.Services.AddTransient<ICarService, CarService>();
 		builder.Services.AddTransient<IDriverService, DriverService>();
@@ -14,6 +30,8 @@ public static class ConfigureAppSerivces
 		builder.Services.AddScoped<IUserService, UserService>();
 		builder.Services.AddScoped<IRentedCarService, RentedCarService>();
 		builder.Services.AddScoped<ICustomerService, CustomerService>();
+
+		//Register the Core Repository here 
 		builder.Services.AddTransient<EfCoreCarRepository>();
 		builder.Services.AddTransient<EfCoreDriverRepository>();
 		builder.Services.AddTransient<EfCoreCustomerRepository>();
@@ -63,6 +81,8 @@ public static class ConfigureAppSerivces
 		builder.Services.AddSingleton(mapper);
 		builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+
+		//Register The MediatR Service
 		builder.Services.AddMediatR(con => con.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
 
 		//For using In-Memory Caching
@@ -71,22 +91,8 @@ public static class ConfigureAppSerivces
 
 
 
-		//Configure the program to work with sql database
-		string? connectionString = builder.Configuration.GetConnectionString("MyConnection");
-		if (connectionString is not null)
-		{
-			builder.Services.AddDbContext<ApplicationDbContext>(options =>
-			{
-				options.UseSqlServer(connectionString);
-				options.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()));
-				options.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Information)));
-			});
-		}
-		else
-		{
-			throw new InvalidOperationException("Connection string is null or not found");
-		}
 
 
 	}
+
 }

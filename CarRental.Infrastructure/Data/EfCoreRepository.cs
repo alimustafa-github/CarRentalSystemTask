@@ -1,5 +1,5 @@
 ﻿namespace CarRental.Infrastructure.Data;
-public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
+public class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 	where TEntity : class
 	where TContext : DbContext
 {
@@ -85,6 +85,7 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 		}
 
 		var propertyAsString = Expression.Call(property, "ToString", null);
+		
 		var propertyValueAsString = Expression.Constant(propertyValue?.ToString());
 
 		var equals2 = Expression.Equal(propertyAsString, propertyValueAsString);
@@ -102,8 +103,7 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 
 
 	public IQueryable<TEntity> ApplySorting(IQueryable<TEntity> query, string sortProperty, bool ascending)
-	{
-
+	{ 
 
 		PropertyInfo propertyExists = typeof(TEntity).GetProperty(sortProperty, BindingFlags.Public | BindingFlags.Instance);
 		if (propertyExists is null)
@@ -122,7 +122,7 @@ public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
 		PropertyInfo propertyExists = typeof(TEntity).GetProperty(searchProperty, BindingFlags.Public | BindingFlags.Instance);
 		if (propertyExists is null)
 		{
-			throw new InvalidOperationException("Please double check the SearchProperty is correct");
+			throw new InvalidOperationException("Please double check if the SearchProperty is correct");
 		}
 		var parameter = Expression.Parameter(typeof(TEntity));
 		var propertyAccess = Expression.Property(parameter, searchProperty);

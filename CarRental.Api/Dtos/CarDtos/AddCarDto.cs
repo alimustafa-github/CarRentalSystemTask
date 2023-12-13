@@ -11,5 +11,4 @@ public record AddCarDto
 
     public bool IsRented { get; set; }
 
-    public Guid DriverId { get; set; }
 }

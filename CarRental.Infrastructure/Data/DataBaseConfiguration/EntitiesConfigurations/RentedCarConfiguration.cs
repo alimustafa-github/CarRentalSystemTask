@@ -11,9 +11,19 @@ public class RentedCarConfiguration : IEntityTypeConfiguration<RentedCar>
 
 		builder.Property(r => r.DriverId).IsRequired(false);
 		builder.HasIndex(d => d.DriverId).IsUnique();
+		builder.HasOne(r => r.Driver)
+			   .WithOne(d => d.RentedCar)
+			   .HasForeignKey<RentedCar>(r => r.DriverId)
+			   .OnDelete(DeleteBehavior.Restrict);
 
 		builder.Property(r => r.CarId).IsRequired();
 		builder.HasIndex(r => r.CarId).IsUnique();
+		builder.Property(r => r.DriverId).IsRequired(false);
+		builder.HasIndex(d => d.DriverId).IsUnique();
+		builder.HasOne(r => r.Car)
+			   .WithOne(c => c.RentalDetails)
+			   .HasForeignKey<RentedCar>(r => r.CarId)
+			   .OnDelete(DeleteBehavior.Restrict);
 
 		builder.Property(r => r.CustomerId).IsRequired();
 		builder.HasOne(r => r.Customer)

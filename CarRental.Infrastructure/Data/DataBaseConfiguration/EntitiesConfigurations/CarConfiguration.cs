@@ -25,12 +25,5 @@ public class CarConfiguration : IEntityTypeConfiguration<Car>
 		builder.Property(c => c.EngineCapacity).IsRequired().HasMaxLength(10);
 
 		builder.Property(c => c.IsRented).IsRequired().HasDefaultValue(false);
-
-		builder.HasOne(c => c.Driver)
-			   .WithOne(d => d.Car)
-			   .HasForeignKey<Car>(c => c.DriverId)
-			   .OnDelete(DeleteBehavior.Restrict);
-		builder.Property(c => c.DriverId).IsRequired();
-		builder.HasIndex(c => c.DriverId).IsUnique();
 	}
 }

@@ -126,7 +126,7 @@ public class RentedCarService : IRentedCarService
 
 
 
-	public class CarRentedEvent : INotification
+	public record CarRentedEvent : INotification
 	{
 		public Guid CarId { get; set; }
 		public Guid? DriverId { get; set; }
